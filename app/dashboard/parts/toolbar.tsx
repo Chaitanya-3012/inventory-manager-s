@@ -2,9 +2,12 @@
 
 import { ButtonIcon } from "@/components/ui/iconButton";
 import { Plus } from "lucide-react";
-import { useState } from "react";
-export default function Toolbar() {
-  const [isOpen, setIsOpen] = useState(false);
+
+type ToolbarProps = {
+  onAddClick: () => void;
+};
+
+export default function Toolbar({ onAddClick }: ToolbarProps) {
   return (
     <div className="mb-4 flex justify-end">
       <ButtonIcon
@@ -13,8 +16,7 @@ export default function Toolbar() {
         text="Add New"
         onClickFunction={(e) => {
           e.preventDefault();
-          setIsOpen(true);
-          console.log("Clicked");
+          onAddClick();
         }}
       />
     </div>

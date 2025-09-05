@@ -6,7 +6,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { ButtonIcon } from "@/components/ui/iconButton";
-import DataPage from "./data-page";
+import DataPage from "./parts/data-page";
 
 export default function Page() {
   return (
@@ -21,7 +21,7 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
-          <ButtonIcon className="mr-4" />
+          <ButtonIcon className="mr-4" varient="theme" />
         </header>
         {/*Main Content*/}
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

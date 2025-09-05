@@ -21,7 +21,7 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
-          <ButtonIcon className="mr-4" varient="theme" />
+          <ButtonIcon className="mr-4" variant="theme" />
         </header>
         {/*Main Content*/}
         <div className="flex flex-1 flex-col gap-4 p-4 pt-0">

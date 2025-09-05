@@ -8,7 +8,7 @@ export default function Toolbar() {
   return (
     <div className="mb-4 flex justify-end">
       <ButtonIcon
-        varient="icon"
+        variant="icon"
         icon={<Plus />}
         text="Add New"
         onClickFunction={(e) => {

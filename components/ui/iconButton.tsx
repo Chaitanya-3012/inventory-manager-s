@@ -7,13 +7,13 @@ import ThemeSwitch from "@/lib/Theme-Switch";
 import { on } from "events";
 export function ButtonIcon({
   className,
-  varient,
+  variant,
   text,
   icon,
   onClickFunction = (e) => {},
 }: {
   className?: string;
-  varient?: "theme" | "icon";
+  variant?: "theme" | "icon";
   text?: string;
   icon?: React.ReactNode;
   onClickFunction?: (
@@ -24,7 +24,7 @@ export function ButtonIcon({
   const { theme, handleToggle } = ThemeSwitch();
   return (
     <div className={className}>
-      {varient === "theme" ? (
+      {variant === "theme" ? (
         <Button
           variant="secondary"
           size="icon"

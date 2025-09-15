@@ -1,6 +1,7 @@
 "use client";
 
 import { ButtonIcon } from "@/components/ui/iconButton";
+import { Label } from "@/components/ui/label";
 import { X } from "lucide-react";
 export default function AddMenu({
   setIsOpen,
@@ -19,9 +20,11 @@ export default function AddMenu({
           setIsOpen(false);
         }}
       />
-      <div className="h-[50vh] w-[50vw] text-3xl flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-white dark:bg-gray-800 shadow-lg">
-        Add Menu
-      </div>
+      <form className="h-[50vh] w-[50vw] text-3xl flex items-center justify-center">
+        <Label htmlFor="title" className="text-center">
+          Add Menu
+        </Label>
+      </form>
     </div>
   );
 }

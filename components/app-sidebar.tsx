@@ -1,16 +1,8 @@
 "use client";
 
 import * as React from "react";
-import {
-  BookOpen,
-  Command,
-  LifeBuoy,
-  Send,
-  Settings2,
-  SquareTerminal,
-} from "lucide-react";
+import { Command, LifeBuoy, Send } from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
 import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
@@ -22,6 +14,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { NavMain } from "@/components/nav-main";
 
 const data = {
   user: {
@@ -29,74 +22,6 @@ const data = {
     email: "m@example.com",
     avatar: "/avatars/shadcn.jpg",
   },
-  navMain: [
-    {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: "History",
-          url: "#",
-        },
-        {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
-        },
-      ],
-    },
-  ],
   navSecondary: [
     {
       title: "Support",
@@ -124,7 +49,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">Atlas Inc</span>
-                  <span className="truncate text-xs">Enterprise</span>
                 </div>
               </a>
             </SidebarMenuButton>
@@ -132,8 +56,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavSecondary items={data.navSecondary} className="mt-auto" />
+        <NavMain items={data.navSecondary} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={data.user} />

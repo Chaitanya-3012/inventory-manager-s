@@ -1,6 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { ThemeProvider } from "@/components/theme-provider";
-import { ButtonIcon } from "@/components/ui/iconButton";
+import { ThemeSwitchButton } from "@/components/ui/themeSwitchButton";
 import {
   SidebarInset,
   SidebarProvider,
@@ -33,7 +33,7 @@ export default function RootLayout({
                     className="mr-2 data-[orientation=vertical]:h-4"
                   />
                 </div>
-                <ButtonIcon className="mr-4" variant="theme" />
+                <ThemeSwitchButton className="mr-4" />
               </header>
               {/*Main Content*/}
               {children}

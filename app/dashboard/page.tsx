@@ -1,9 +1,96 @@
-import DataPage from "./parts/data-page";
+"use client";
 
-export default function Page() {
+import * as React from "react";
+import { columns, ProductRow } from "./columns";
+import { DataTable } from "./data-table";
+import { AddProductDialog } from "./add-product-dialog";
+
+export default function ProductsPage() {
+  const [products, setProducts] = React.useState<ProductRow[]>([]);
+  const [categories, setCategories] = React.useState([]);
+  const [suppliers, setSuppliers] = React.useState([]);
+  const [users, setUsers] = React.useState([]);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  const fetchProducts = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/products");
+      if (res.ok) {
+        const data = await res.json();
+        setProducts(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch products:", error);
+    }
+  }, []);
+
+  const fetchCategories = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/categories");
+      if (res.ok) {
+        const data = await res.json();
+        setCategories(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch categories:", error);
+    }
+  }, []);
+
+  const fetchSuppliers = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/suppliers");
+      if (res.ok) {
+        const data = await res.json();
+        setSuppliers(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch suppliers:", error);
+    }
+  }, []);
+
+  const fetchUsers = React.useCallback(async () => {
+    try {
+      const res = await fetch("/api/users");
+      if (res.ok) {
+        const data = await res.json();
+        setUsers(data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const loadData = async () => {
+      setIsLoading(true);
+      await Promise.all([
+        fetchProducts(),
+        fetchCategories(),
+        fetchSuppliers(),
+        fetchUsers(),
+      ]);
+      setIsLoading(false);
+    };
+    loadData();
+  }, [fetchProducts, fetchCategories, fetchSuppliers, fetchUsers]);
+
+  const handleProductAdded = () => {
+    fetchProducts();
+  };
+
   return (
-    <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-      <DataPage />
-    </div>
+    <main className="container mx-auto py-8">
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-3xl font-bold">Products</h1>
+        <AddProductDialog
+          onProductAdded={handleProductAdded}
+          categories={categories}
+          suppliers={suppliers}
+          users={users}
+        />
+      </div>
+
+      <DataTable columns={columns} data={products} isLoading={isLoading} />
+    </main>
   );
 }

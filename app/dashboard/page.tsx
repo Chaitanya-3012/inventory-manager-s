@@ -7,7 +7,6 @@ import { AddProductDialog } from "./add-product-dialog";
 
 export default function ProductsPage() {
   const [products, setProducts] = React.useState<ProductRow[]>([]);
-  const [categories, setCategories] = React.useState([]);
   const [suppliers, setSuppliers] = React.useState([]);
   const [users, setUsers] = React.useState([]);
   const [isLoading, setIsLoading] = React.useState(true);
@@ -21,18 +20,6 @@ export default function ProductsPage() {
       }
     } catch (error) {
       console.error("Failed to fetch products:", error);
-    }
-  }, []);
-
-  const fetchCategories = React.useCallback(async () => {
-    try {
-      const res = await fetch("/api/categories");
-      if (res.ok) {
-        const data = await res.json();
-        setCategories(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch categories:", error);
     }
   }, []);
 
@@ -63,16 +50,11 @@ export default function ProductsPage() {
   React.useEffect(() => {
     const loadData = async () => {
       setIsLoading(true);
-      await Promise.all([
-        fetchProducts(),
-        fetchCategories(),
-        fetchSuppliers(),
-        fetchUsers(),
-      ]);
+      await Promise.all([fetchProducts(), fetchSuppliers(), fetchUsers()]);
       setIsLoading(false);
     };
     loadData();
-  }, [fetchProducts, fetchCategories, fetchSuppliers, fetchUsers]);
+  }, [fetchProducts, fetchSuppliers, fetchUsers]);
 
   const handleProductAdded = () => {
     fetchProducts();
@@ -84,7 +66,6 @@ export default function ProductsPage() {
         <h1 className="text-3xl font-bold">Products</h1>
         <AddProductDialog
           onProductAdded={handleProductAdded}
-          categories={categories}
           suppliers={suppliers}
           users={users}
         />

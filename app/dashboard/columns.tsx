@@ -9,7 +9,7 @@ export type ProductRow = {
   price: number;
   costPrice: number;
   quantity: number;
-  categoryId: { name: string };
+  category: string;
   supplierId: { name: string };
   createdBy: { name: string };
   createdAt: string;
@@ -21,11 +21,11 @@ export const columns: ColumnDef<ProductRow>[] = [
     header: "Product Name",
   },
   {
-    accessorKey: "categoryId.name",
+    accessorKey: "category",
     header: "Category",
     cell: ({ row }) => {
-      const category = row.original.categoryId;
-      return category?.name || "N/A";
+      const category = row.getValue("category") as string;
+      return category || "N/A";
     },
   },
   {

@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useForm } from "react-hook-form";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -37,7 +37,7 @@ const productSchema = z.object({
   price: z.coerce.number().min(0, "Price must be positive"),
   costPrice: z.coerce.number().min(0, "Cost price must be positive"),
   quantity: z.coerce.number().min(0, "Quantity must be non-negative"),
-  categoryId: z.string().min(1, "Category is required"),
+  category: z.string().min(1, "Category is required"),
   supplierId: z.string().min(1, "Supplier is required"),
   createdBy: z.string().min(1, "Created by is required"),
 });
@@ -46,14 +46,12 @@ type ProductFormValues = z.infer<typeof productSchema>;
 
 interface AddProductDialogProps {
   onProductAdded: () => void;
-  categories: Array<{ _id: string; name: string }>;
   suppliers: Array<{ _id: string; name: string }>;
   users: Array<{ _id: string; name: string }>;
 }
 
 export function AddProductDialog({
   onProductAdded,
-  categories,
   suppliers,
   users,
 }: AddProductDialogProps) {
@@ -61,14 +59,14 @@ export function AddProductDialog({
   const [isLoading, setIsLoading] = React.useState(false);
 
   const form = useForm<ProductFormValues>({
-    resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema) as Resolver<ProductFormValues>,
     defaultValues: {
       name: "",
       description: "",
       price: 0,
       costPrice: 0,
       quantity: 0,
-      categoryId: "",
+      category: "",
       supplierId: "",
       createdBy: "",
     },
@@ -116,9 +114,9 @@ export function AddProductDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <Form {...form}>
+        <Form<ProductFormValues> {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <FormField
+            <FormField<ProductFormValues>
               control={form.control}
               name="name"
               render={({ field }) => (
@@ -132,7 +130,7 @@ export function AddProductDialog({
               )}
             />
 
-            <FormField
+            <FormField<ProductFormValues>
               control={form.control}
               name="description"
               render={({ field }) => (
@@ -150,7 +148,7 @@ export function AddProductDialog({
             />
 
             <div className="grid grid-cols-2 gap-4">
-              <FormField
+              <FormField<ProductFormValues>
                 control={form.control}
                 name="costPrice"
                 render={({ field }) => (
@@ -169,7 +167,7 @@ export function AddProductDialog({
                 )}
               />
 
-              <FormField
+              <FormField<ProductFormValues>
                 control={form.control}
                 name="price"
                 render={({ field }) => (
@@ -189,7 +187,7 @@ export function AddProductDialog({
               />
             </div>
 
-            <FormField
+            <FormField<ProductFormValues>
               control={form.control}
               name="quantity"
               render={({ field }) => (
@@ -203,35 +201,21 @@ export function AddProductDialog({
               )}
             />
 
-            <FormField
+            <FormField<ProductFormValues>
               control={form.control}
-              name="categoryId"
+              name="category"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {categories.map((cat) => (
-                        <SelectItem key={cat._id} value={cat._id}>
-                          {cat.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <Input placeholder="Category name" {...field} />
+                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
+            <FormField<ProductFormValues>
               control={form.control}
               name="supplierId"
               render={({ field }) => (
@@ -239,7 +223,7 @@ export function AddProductDialog({
                   <FormLabel>Supplier</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value as string | undefined}
                   >
                     <FormControl>
                       <SelectTrigger>
@@ -259,7 +243,7 @@ export function AddProductDialog({
               )}
             />
 
-            <FormField
+            <FormField<ProductFormValues>
               control={form.control}
               name="createdBy"
               render={({ field }) => (
@@ -267,7 +251,7 @@ export function AddProductDialog({
                   <FormLabel>Created By</FormLabel>
                   <Select
                     onValueChange={field.onChange}
-                    defaultValue={field.value}
+                    defaultValue={field.value as string | undefined}
                   >
                     <FormControl>
                       <SelectTrigger>

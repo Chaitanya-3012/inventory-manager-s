@@ -13,7 +13,6 @@ A comprehensive web-based inventory management system built with Next.js and Mon
 - **Product Management** - Create, Read, Update, Delete products with detailed information
 - **Transaction Tracking** - Record and track stock movements (IN/OUT) with user accountability
 - **Real-time Inventory Updates** - Live stock level adjustments and automatic updates
-- **Category Organization** - Organize products by predefined categories
 - **Supplier Management** - Track and manage supplier information and contacts
 - **User Authentication** - Secure login with role-based access control
 - **Dashboard Analytics** - Interactive data visualization and reporting
@@ -23,7 +22,7 @@ A comprehensive web-based inventory management system built with Next.js and Mon
 
 ## 📊 Database Architecture
 
-### 5 Collections with Complete Schema
+### 4 Collections with Complete Schema
 
 #### 1. USER Collection
 
@@ -38,15 +37,7 @@ User accounts and authentication management
 - `isActive` (Boolean) - Account active status
 - `createdAt`, `updatedAt` (DateTime)
 
-#### 2. CATEGORY Collection
-
-Product categorization system
-
-- `_id` (ObjectId) - Primary Key
-- `name` (String) - Category name (unique)
-- `description` (String) - Category description
-- `icon` (String) - Icon reference/name
-- `createdAt`, `updatedAt` (DateTime)
+(Categories are _not_ stored as a separate collection. Each product includes a `category` string field for flexible categorization.)
 
 #### 3. SUPPLIER Collection
 
@@ -74,7 +65,7 @@ Inventory items and product information
 - `price` (Number, required) - Selling price
 - `costPrice` (Number, required) - Cost/purchase price
 - `quantity` (Number, required) - Current stock level
-- `categoryId` (ObjectId, ref: Category, required) - Category reference
+- `category` (String, required) - Category name (free-text)
 - `supplierId` (ObjectId, ref: Supplier, required) - Supplier reference
 - `createdBy` (ObjectId, ref: User, required) - Creator user reference
 - `createdAt`, `updatedAt` (DateTime)
@@ -97,9 +88,10 @@ Stock movement tracking and transaction history
 ```
 USER → PRODUCT (one-to-many via createdBy)
 USER → TRANSACTION (one-to-many via performedBy)
-CATEGORY → PRODUCT (one-to-many via categoryId)
 SUPPLIER → PRODUCT (one-to-many via supplierId)
 PRODUCT → TRANSACTION (one-to-many via productId)
+
+Note: Categories are represented as free-text on products (no dedicated collection).
 ```
 
 ---
@@ -114,12 +106,7 @@ PRODUCT → TRANSACTION (one-to-many via productId)
 - `PUT /api/users/:id` - Update user information
 - `DELETE /api/users/:id` - Delete user account
 
-### Categories API (4 endpoints)
-
-- `POST /api/categories` - Create new category
-- `GET /api/categories` - List all categories
-- `PUT /api/categories/:id` - Update category
-- `DELETE /api/categories/:id` - Delete category
+(No dedicated Categories API — product `category` is a string field on products.)
 
 ### Suppliers API (4 endpoints)
 
@@ -135,7 +122,7 @@ PRODUCT → TRANSACTION (one-to-many via productId)
 - `GET /api/products/:id` - Get single product
 - `PUT /api/products/:id` - Update product
 - `DELETE /api/products/:id` - Delete product
-- `GET /api/products/category/:categoryId` - Get products by category
+- `GET /api/products/supplier/:supplierId` - Get products by supplier
 - `GET /api/products/supplier/:supplierId` - Get products by supplier
 
 ### Transactions API (6 endpoints)
@@ -185,7 +172,7 @@ PRODUCT → TRANSACTION (one-to-many via productId)
 
 - [ ] Setup MongoDB connection and validate models
 - [ ] Create User API endpoints (CRUD)
-- [ ] Create Category API endpoints (CRUD)
+
 - [ ] Create Supplier API endpoints (CRUD)
 - [ ] Create Product API endpoints (CRUD + filters)
 - [ ] Create Transaction API endpoints (CRUD)
@@ -202,7 +189,7 @@ PRODUCT → TRANSACTION (one-to-many via productId)
 - [ ] Add form submission handlers
 - [ ] Implement data fetching hooks
 - [ ] Add loading and error states UI
-- [ ] Build Category dropdown component
+- [ ] Build Supplier dropdown component
 - [ ] Build Supplier dropdown component
 - [ ] Implement real-time quantity updates
 - [ ] Add edit/delete action buttons
@@ -270,7 +257,6 @@ inventory-manager-s/
 │   └── theme-provider.tsx
 ├── models/                # Mongoose schemas
 │   ├── UserSchema.ts
-│   ├── CategorySchema.ts
 │   ├── SupplierSchema.ts
 │   ├── ProductSchema.ts
 │   └── TransactionSchema.ts
@@ -293,7 +279,7 @@ inventory-manager-s/
 
 ### Completed
 
-✅ Database schemas created (5 collections with all fields)
+✅ Database schemas created (users, suppliers, products, transactions)
 ✅ Entity relationships defined
 ✅ API endpoint specifications documented
 ✅ Project structure initialized

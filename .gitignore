@@ -13,6 +13,8 @@
 # testing
 /coverage
 
+# github co-pilot
+.github
 # next.js
 /.next/
 /out/

@@ -1,28 +1,36 @@
 import { NextResponse } from "next/server";
+import dummyData from "@/lib/dummy-data.json";
 
 export async function GET(
   _req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  return NextResponse.json({
-    message: `this is /suppliers/${params.id} route`,
-  });
+  const { id } = await params;
+  const supplier = dummyData.suppliers.find((s) => s._id === id);
+  if (!supplier) {
+    return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
+  }
+  return NextResponse.json(supplier);
 }
 
 export async function PUT(
-  _req: Request,
-  { params }: { params: { id: string } },
+  req: Request,
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
+  const body = await req.json();
   return NextResponse.json({
-    message: `PUT to /suppliers/${params.id} (placeholder)`,
+    message: `Supplier ${id} updated (placeholder)`,
+    data: body,
   });
 }
 
 export async function DELETE(
   _req: Request,
-  { params }: { params: { id: string } },
+  { params }: { params: Promise<{ id: string }> },
 ) {
+  const { id } = await params;
   return NextResponse.json({
-    message: `DELETE to /suppliers/${params.id} (placeholder)`,
+    message: `Supplier ${id} deleted (placeholder)`,
   });
 }

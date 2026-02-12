@@ -1,9 +1,15 @@
 import { NextResponse } from "next/server";
+import dummyData from "@/lib/dummy-data.json";
 
 export async function GET() {
-  return NextResponse.json({ message: "this is /users route" });
+  return NextResponse.json(dummyData.users);
 }
 
-export async function POST() {
-  return NextResponse.json({ message: "POST to /users (placeholder)" });
+export async function POST(req: Request) {
+  const body = await req.json();
+  // TODO: Validate with Zod and save to MongoDB
+  return NextResponse.json(
+    { message: "User created (placeholder)", data: body },
+    { status: 201 },
+  );
 }

@@ -1,16 +1,12 @@
 import { NextResponse } from "next/server";
-import dummyData from "@/lib/dummy-data.json";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const supplier = dummyData.suppliers.find((s) => s._id === id);
-  if (!supplier) {
-    return NextResponse.json({ error: "Supplier not found" }, { status: 404 });
-  }
-  return NextResponse.json(supplier);
+  // TODO: Replace with MongoDB query
+  return NextResponse.json({ error: "Not implemented" }, { status: 501 });
 }
 
 export async function PUT(
@@ -19,10 +15,11 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await req.json();
-  return NextResponse.json({
-    message: `Supplier ${id} updated (placeholder)`,
-    data: body,
-  });
+  // TODO: Validate and update in MongoDB
+  return NextResponse.json(
+    { message: "Update not yet implemented", id, data: body },
+    { status: 501 },
+  );
 }
 
 export async function DELETE(
@@ -30,7 +27,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  return NextResponse.json({
-    message: `Supplier ${id} deleted (placeholder)`,
-  });
+  // TODO: Delete from MongoDB
+  return NextResponse.json(
+    { message: "Delete not yet implemented", id },
+    { status: 501 },
+  );
 }

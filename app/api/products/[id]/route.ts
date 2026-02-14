@@ -1,18 +1,12 @@
 import { NextResponse } from "next/server";
-import dummyData from "@/lib/dummy-data.json";
-import { populateProductReferences } from "@/lib/populate-references";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const product = dummyData.products.find((p) => p._id === id);
-  if (!product) {
-    return NextResponse.json({ error: "Product not found" }, { status: 404 });
-  }
-  const productWithRefs = populateProductReferences(product);
-  return NextResponse.json(productWithRefs);
+  // TODO: Replace with MongoDB query
+  return NextResponse.json({ error: "Not implemented" }, { status: 501 });
 }
 
 export async function PUT(
@@ -21,10 +15,11 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await req.json();
-  return NextResponse.json({
-    message: `Product ${id} updated (placeholder)`,
-    data: body,
-  });
+  // TODO: Validate and update in MongoDB
+  return NextResponse.json(
+    { message: "Update not yet implemented", id, data: body },
+    { status: 501 },
+  );
 }
 
 export async function DELETE(
@@ -32,7 +27,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  return NextResponse.json({
-    message: `Product ${id} deleted (placeholder)`,
-  });
+  // TODO: Delete from MongoDB
+  return NextResponse.json(
+    { message: "Delete not yet implemented", id },
+    { status: 501 },
+  );
 }

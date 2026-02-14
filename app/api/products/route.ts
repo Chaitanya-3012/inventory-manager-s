@@ -1,17 +1,15 @@
 import { NextResponse } from "next/server";
-import dummyData from "@/lib/dummy-data.json";
-import { populateProductsReferences } from "@/lib/populate-references";
 
 export async function GET() {
-  const productsWithRefs = populateProductsReferences(dummyData.products);
-  return NextResponse.json(productsWithRefs);
+  // TODO: Replace with MongoDB query
+  return NextResponse.json([]);
 }
 
 export async function POST(req: Request) {
   const body = await req.json();
   // TODO: Validate with Zod and save to MongoDB
   return NextResponse.json(
-    { message: "Product created (placeholder)", data: body },
-    { status: 201 },
+    { message: "Product creation not yet implemented", data: body },
+    { status: 501 },
   );
 }

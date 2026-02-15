@@ -1,19 +1,31 @@
 import { NextResponse } from "next/server";
-import dummyData from "@/lib/dummy-data.json";
+import mongoose from "mongoose";
+import { z } from "zod";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  const transaction = dummyData.transactions.find((t) => t._id === id);
-  if (!transaction) {
+  try {
+    const transactionData = await mongoose
+      .model("Transaction")
+      .findById(id)
+      .populate("productId")
+      .populate("performedBy");
+    if (!transactionData) {
+      return NextResponse.json(
+        { error: "Transaction not found" },
+        { status: 404 },
+      );
+    }
+    return NextResponse.json(transactionData);
+  } catch (error) {
     return NextResponse.json(
-      { error: "Transaction not found" },
-      { status: 404 },
+      { error: "Failed to retrieve transaction" },
+      { status: 500 },
     );
   }
-  return NextResponse.json(transaction);
 }
 
 export async function PUT(
@@ -22,10 +34,45 @@ export async function PUT(
 ) {
   const { id } = await params;
   const body = await req.json();
-  return NextResponse.json({
-    message: `Transaction ${id} updated (placeholder)`,
-    data: body,
-  });
+
+  try {
+    z.object({
+      quantity: z.number().positive().optional(),
+      transactionType: z.enum(["IN", "OUT"]).optional(),
+      notes: z.string().optional(),
+    }).parse(body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid transaction data", details: error.issues },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json(
+      { error: "Failed to validate transaction data" },
+      { status: 500 },
+    );
+  }
+
+  try {
+    const updatedTransaction = await mongoose
+      .model("Transaction")
+      .findByIdAndUpdate(id, body, { new: true })
+      .populate("productId")
+      .populate("performedBy");
+    if (!updatedTransaction) {
+      return NextResponse.json(
+        { error: "Transaction not found" },
+        { status: 404 },
+      );
+    }
+    return NextResponse.json(updatedTransaction);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to update transaction" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function DELETE(
@@ -33,7 +80,39 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  return NextResponse.json({
-    message: `Transaction ${id} deleted (placeholder)`,
-  });
+
+  try {
+    z.object({
+      id: z.string().length(24, "Invalid transaction ID"),
+    }).parse({ id });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid transaction ID", details: error.issues },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json(
+      { error: "Failed to validate transaction ID" },
+      { status: 500 },
+    );
+  }
+
+  try {
+    const deletedTransaction = await mongoose
+      .model("Transaction")
+      .findByIdAndDelete(id);
+    if (!deletedTransaction) {
+      return NextResponse.json(
+        { error: "Transaction not found" },
+        { status: 404 },
+      );
+    }
+    return NextResponse.json({ message: "Transaction deleted successfully" });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to delete transaction" },
+      { status: 500 },
+    );
+  }
 }

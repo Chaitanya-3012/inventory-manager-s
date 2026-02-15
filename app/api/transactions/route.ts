@@ -1,15 +1,55 @@
+import mongoose from "mongoose";
 import { NextResponse } from "next/server";
+import { z } from "zod";
 
 export async function GET() {
-  // TODO: Replace with MongoDB query
-  return NextResponse.json([]);
+  try {
+    const transactions = await mongoose
+      .model("Transaction")
+      .find({})
+      .populate("productId")
+      .populate("performedBy");
+    return NextResponse.json(transactions);
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Failed to retrieve transactions" },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(req: Request) {
   const body = await req.json();
-  // TODO: Validate with Zod and save to MongoDB
-  return NextResponse.json(
-    { message: "Transaction creation not yet implemented", data: body },
-    { status: 501 },
-  );
+
+  try {
+    z.object({
+      productId: z.string().length(24, "Invalid product ID"),
+      quantity: z.number().positive(),
+      transactionType: z.enum(["IN", "OUT"]),
+      performedBy: z.string().length(24, "Invalid user ID"),
+      notes: z.string().optional(),
+    }).parse(body);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { error: "Invalid transaction data", details: error.issues },
+        { status: 400 },
+      );
+    }
+    return NextResponse.json(
+      { error: "Failed to validate transaction data" },
+      { status: 500 },
+    );
+  }
+
+  try {
+    const newTransaction = await mongoose.model("Transaction").create(body);
+    return NextResponse.json(newTransaction, { status: 201 });
+  } catch (error) {
+    console.error("Error creating transaction:", error);
+    return NextResponse.json(
+      { error: "Failed to create transaction" },
+      { status: 500 },
+    );
+  }
 }

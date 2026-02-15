@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { z } from "zod";
+import bcrypt from "bcrypt";
+import { connectDB } from "@/lib/mongodb";
+import "@/models/UserSchema";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await connectDB();
   const { id } = await params;
   try {
     const userData = await mongoose.model("User").findById(id);
@@ -25,8 +29,17 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await connectDB();
   const { id } = await params;
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Invalid JSON in request body" },
+      { status: 400 },
+    );
+  }
 
   try {
     z.object({
@@ -50,9 +63,17 @@ export async function PUT(
   }
 
   try {
+    let updateData = body;
+    if (body.password) {
+      const hashedPassword = await bcrypt.hash(body.password, 10);
+      updateData = {
+        ...body,
+        password: hashedPassword,
+      };
+    }
     const updatedUser = await mongoose
       .model("User")
-      .findByIdAndUpdate(id, body, { new: true });
+      .findByIdAndUpdate(id, updateData, { new: true });
     if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -69,6 +90,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await connectDB();
   const { id } = await params;
 
   try {

@@ -1,11 +1,14 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { z } from "zod";
+import { connectDB } from "@/lib/mongodb";
+import "@/models/SupplierSchema";
 
 export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await connectDB();
   const { id } = await params;
   try {
     const supplierData = await mongoose.model("Supplier").findById(id);
@@ -28,8 +31,17 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await connectDB();
   const { id } = await params;
-  const body = await req.json();
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Invalid JSON in request body" },
+      { status: 400 },
+    );
+  }
 
   try {
     z.object({
@@ -78,6 +90,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
+  await connectDB();
   const { id } = await params;
 
   try {

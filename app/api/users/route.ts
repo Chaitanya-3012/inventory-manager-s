@@ -1,8 +1,12 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import bcrypt from "bcrypt";
+import { connectDB } from "@/lib/mongodb";
+import "@/models/UserSchema";
 
 export async function GET() {
+  await connectDB();
   try {
     const users = await mongoose.model("User").find({});
     return NextResponse.json(users);
@@ -15,7 +19,16 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  await connectDB();
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Invalid JSON in request body" },
+      { status: 400 },
+    );
+  }
 
   try {
     z.object({
@@ -39,7 +52,14 @@ export async function POST(req: Request) {
   }
 
   try {
-    const newUser = await mongoose.model("User").create(body);
+    const hashedPassword = await bcrypt.hash(body.password, 10);
+    const userDataWithHashedPassword = {
+      ...body,
+      password: hashedPassword,
+    };
+    const newUser = await mongoose
+      .model("User")
+      .create(userDataWithHashedPassword);
     return NextResponse.json(newUser, { status: 201 });
   } catch (error) {
     console.error("Error creating user:", error);

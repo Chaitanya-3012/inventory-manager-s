@@ -1,8 +1,11 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { connectDB } from "@/lib/mongodb";
+import "@/models/SupplierSchema";
 
 export async function GET() {
+  await connectDB();
   try {
     const suppliers = await mongoose.model("Supplier").find({});
     return NextResponse.json(suppliers);
@@ -15,7 +18,16 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
+  await connectDB();
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Invalid JSON in request body" },
+      { status: 400 },
+    );
+  }
 
   try {
     z.object({

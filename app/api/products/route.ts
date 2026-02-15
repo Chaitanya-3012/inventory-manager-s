@@ -1,6 +1,10 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import "@/models/ProductSchema";
+import "@/models/SupplierSchema";
+import "@/models/UserSchema";
+import { connectDB } from "@/lib/mongodb";
 
 export async function GET() {
   // TODO: Replace with MongoDB query
@@ -16,8 +20,17 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  
+  await connectDB();
+  let body;
+  try {
+    body = await req.json();
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Invalid JSON in request body" },
+      { status: 400 },
+    );
+  }
+
   try {
     z.object({
       name: z.string().min(2).max(100),

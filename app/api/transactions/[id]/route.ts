@@ -10,9 +10,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   try {
+    await connectDB();
     const transactionData = await mongoose
       .model("Transaction")
       .findById(id)
@@ -37,7 +37,6 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   let body;
   try {
@@ -69,6 +68,7 @@ export async function PUT(
   }
 
   try {
+    await connectDB();
     const updatedTransaction = await mongoose
       .model("Transaction")
       .findByIdAndUpdate(id, body, { new: true })
@@ -93,7 +93,6 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
 
   try {
@@ -114,6 +113,7 @@ export async function DELETE(
   }
 
   try {
+    await connectDB();
     const deletedTransaction = await mongoose
       .model("Transaction")
       .findByIdAndDelete(id);

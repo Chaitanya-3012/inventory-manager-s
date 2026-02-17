@@ -19,7 +19,6 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  await connectDB();
   let body;
   try {
     body = await req.json();
@@ -57,6 +56,7 @@ export async function POST(req: Request) {
       ...body,
       password: hashedPassword,
     };
+    await connectDB();
     const newUser = await mongoose
       .model("User")
       .create(userDataWithHashedPassword);

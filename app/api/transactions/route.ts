@@ -7,8 +7,8 @@ import "@/models/ProductSchema";
 import "@/models/UserSchema";
 
 export async function GET() {
-  await connectDB();
   try {
+    await connectDB();
     const transactions = await mongoose
       .model("Transaction")
       .find({})
@@ -24,7 +24,6 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  await connectDB();
   let body;
   try {
     body = await req.json();
@@ -57,6 +56,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    await connectDB();
     const newTransaction = await mongoose.model("Transaction").create(body);
     return NextResponse.json(newTransaction, { status: 201 });
   } catch (error) {

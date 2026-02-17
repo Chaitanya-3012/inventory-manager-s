@@ -8,9 +8,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   try {
+    await connectDB();
     const supplierData = await mongoose.model("Supplier").findById(id);
     if (!supplierData) {
       return NextResponse.json(
@@ -31,7 +31,6 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   let body;
   try {
@@ -68,6 +67,7 @@ export async function PUT(
   }
 
   try {
+    await connectDB();
     const updatedSupplier = await mongoose
       .model("Supplier")
       .findByIdAndUpdate(id, body, { new: true });
@@ -90,7 +90,6 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
 
   try {
@@ -111,6 +110,7 @@ export async function DELETE(
   }
 
   try {
+    await connectDB();
     const deletedSupplier = await mongoose
       .model("Supplier")
       .findByIdAndDelete(id);

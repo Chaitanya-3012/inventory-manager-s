@@ -10,10 +10,10 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   // TODO: Replace with MongoDB query
   try {
+    await connectDB();
     const productData = await mongoose.model("Product").findById(id);
     if (!productData) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -31,7 +31,6 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   let body;
   try {
@@ -65,6 +64,7 @@ export async function PUT(
     );
   }
   try {
+    await connectDB();
     const updatedProduct = await mongoose
       .model("Product")
       .findByIdAndUpdate(id, body, { new: true });
@@ -84,7 +84,6 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
 
   try {
@@ -104,6 +103,7 @@ export async function DELETE(
     );
   }
   try {
+    await connectDB();
     const deletedProduct = await mongoose
       .model("Product")
       .findByIdAndDelete(id);

@@ -7,8 +7,9 @@ import "@/models/UserSchema";
 import { connectDB } from "@/lib/mongodb";
 
 export async function GET() {
-  // TODO: Replace with MongoDB query
+  // returns a list of all products in the database
   try {
+    await connectDB();
     const products = await mongoose.model("Product").find({});
     return NextResponse.json(products);
   } catch (error) {
@@ -20,7 +21,6 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  await connectDB();
   let body;
   try {
     body = await req.json();
@@ -53,6 +53,7 @@ export async function POST(req: Request) {
     );
   }
   try {
+    await connectDB();
     const newProduct = await mongoose.model("Product").create(body);
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error) {

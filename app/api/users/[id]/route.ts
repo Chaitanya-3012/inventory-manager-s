@@ -9,9 +9,9 @@ export async function GET(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   try {
+    await connectDB();
     const userData = await mongoose.model("User").findById(id);
     if (!userData) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -29,7 +29,6 @@ export async function PUT(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
   let body;
   try {
@@ -63,6 +62,7 @@ export async function PUT(
   }
 
   try {
+    await connectDB();
     let updateData = body;
     if (body.password) {
       const hashedPassword = await bcrypt.hash(body.password, 10);
@@ -90,7 +90,6 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  await connectDB();
   const { id } = await params;
 
   try {
@@ -111,6 +110,7 @@ export async function DELETE(
   }
 
   try {
+    await connectDB();
     const deletedUser = await mongoose.model("User").findByIdAndDelete(id);
     if (!deletedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });

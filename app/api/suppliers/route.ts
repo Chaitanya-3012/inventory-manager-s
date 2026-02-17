@@ -5,8 +5,8 @@ import { connectDB } from "@/lib/mongodb";
 import "@/models/SupplierSchema";
 
 export async function GET() {
-  await connectDB();
   try {
+    await connectDB();
     const suppliers = await mongoose.model("Supplier").find({});
     return NextResponse.json(suppliers);
   } catch (error) {
@@ -18,7 +18,6 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  await connectDB();
   let body;
   try {
     body = await req.json();
@@ -54,6 +53,7 @@ export async function POST(req: Request) {
   }
 
   try {
+    await connectDB();
     const newSupplier = await mongoose.model("Supplier").create(body);
     return NextResponse.json(newSupplier, { status: 201 });
   } catch (error) {

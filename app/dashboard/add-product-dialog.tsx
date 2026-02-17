@@ -30,6 +30,8 @@ import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { toast } from "sonner";
+import { productsAPI } from "@/lib/api-client";
+import { Spinner } from "@/components/ui/spinner";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required"),
@@ -75,26 +77,18 @@ export function AddProductDialog({
   async function onSubmit(data: ProductFormValues) {
     setIsLoading(true);
     try {
-      const response = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create product");
-      }
+      await productsAPI.create(data);
 
       toast.success("Product created successfully");
 
       form.reset();
       setOpen(false);
       onProductAdded();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating product:", error);
-      toast.error("Failed to create product");
+      const errorMessage =
+        error.response?.data?.error || "Failed to create product";
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -276,11 +270,19 @@ export function AddProductDialog({
                 type="button"
                 variant="outline"
                 onClick={() => setOpen(false)}
+                disabled={isLoading}
               >
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Product"}
+                {isLoading ? (
+                  <div className="flex items-center gap-2">
+                    <Spinner className="size-4" />
+                    <span>Processing...</span>
+                  </div>
+                ) : (
+                  "Create Product"
+                )}
               </Button>
             </div>
           </form>

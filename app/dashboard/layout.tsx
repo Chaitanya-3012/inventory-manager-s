@@ -33,7 +33,6 @@ export default function RootLayout({
             </div>
             <ThemeSwitchButton className="mr-4" />
           </header>
-          {/*Main Content*/}
           {children}
         </SidebarInset>
       </SidebarProvider>

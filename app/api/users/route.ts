@@ -6,13 +6,17 @@ import { connectDB } from "@/lib/mongodb";
 import "@/models/UserSchema";
 
 export async function GET() {
-  await connectDB();
   try {
+    await connectDB();
     const users = await mongoose.model("User").find({});
     return NextResponse.json(users);
   } catch (error) {
+    console.error("Error fetching users:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve users" },
+      {
+        error: "Failed to retrieve users",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -44,8 +48,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    console.error("Validation error:", error);
     return NextResponse.json(
-      { error: "Failed to validate user data" },
+      {
+        error: "Failed to validate user data",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -64,7 +72,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error creating user:", error);
     return NextResponse.json(
-      { error: "Failed to create user" },
+      {
+        error: "Failed to create user",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

@@ -13,8 +13,12 @@ export async function GET() {
     const products = await mongoose.model("Product").find({});
     return NextResponse.json(products);
   } catch (error) {
+    console.error("Error fetching products:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve products" },
+      {
+        error: "Failed to retrieve products",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -47,8 +51,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    console.error("Validation error:", error);
     return NextResponse.json(
-      { error: "Failed to validate product data" },
+      {
+        error: "Failed to validate product data",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -59,7 +67,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error creating product:", error);
     return NextResponse.json(
-      { error: "Failed to create product" },
+      {
+        error: "Failed to create product",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

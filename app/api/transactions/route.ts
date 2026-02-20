@@ -16,8 +16,12 @@ export async function GET() {
       .populate("performedBy");
     return NextResponse.json(transactions);
   } catch (error) {
+    console.error("Error fetching transactions:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve transactions" },
+      {
+        error: "Failed to retrieve transactions",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -49,8 +53,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    console.error("Validation error:", error);
     return NextResponse.json(
-      { error: "Failed to validate transaction data" },
+      {
+        error: "Failed to validate transaction data",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -62,7 +70,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error creating transaction:", error);
     return NextResponse.json(
-      { error: "Failed to create transaction" },
+      {
+        error: "Failed to create transaction",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

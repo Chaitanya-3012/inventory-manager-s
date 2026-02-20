@@ -24,7 +24,19 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    console.error(`[API Error] ${error.message}`);
+    if (error.response) {
+      // Server responded with error status
+      console.error(
+        `[API Error] ${error.response.status} ${error.config.url}`,
+        error.response.data,
+      );
+    } else if (error.request) {
+      // Request made but no response received
+      console.error(`[API Error] No response from server: ${error.message}`);
+    } else {
+      // Error setting up request
+      console.error(`[API Error] Request setup failed: ${error.message}`);
+    }
     return Promise.reject(error);
   },
 );

@@ -10,8 +10,12 @@ export async function GET() {
     const suppliers = await mongoose.model("Supplier").find({});
     return NextResponse.json(suppliers);
   } catch (error) {
+    console.error("Error fetching suppliers:", error);
     return NextResponse.json(
-      { error: "Failed to retrieve suppliers" },
+      {
+        error: "Failed to retrieve suppliers",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -46,8 +50,12 @@ export async function POST(req: Request) {
         { status: 400 },
       );
     }
+    console.error("Validation error:", error);
     return NextResponse.json(
-      { error: "Failed to validate supplier data" },
+      {
+        error: "Failed to validate supplier data",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }
@@ -59,7 +67,10 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error("Error creating supplier:", error);
     return NextResponse.json(
-      { error: "Failed to create supplier" },
+      {
+        error: "Failed to create supplier",
+        details: error instanceof Error ? error.message : String(error),
+      },
       { status: 500 },
     );
   }

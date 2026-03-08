@@ -84,10 +84,10 @@ export function AddProductDialog({
       form.reset();
       setOpen(false);
       onProductAdded();
-    } catch (error: any) {
-      console.error("Error creating product:", error);
+    } catch (error: unknown) {
+      const err = error as { response?: { data?: { error?: string } } };
       const errorMessage =
-        error.response?.data?.error || "Failed to create product";
+        err?.response?.data?.error || "Failed to create product";
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);

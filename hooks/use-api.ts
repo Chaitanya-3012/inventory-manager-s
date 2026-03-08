@@ -5,7 +5,7 @@ import {
   suppliersAPI,
   transactionsAPI,
 } from "@/lib/api-client";
-import type { ProductRow } from "@/app/dashboard/columns";
+import type { ProductRow } from "@/app/dashboard/products/columns";
 
 // ============= PRODUCTS HOOK =============
 export function useProducts() {

@@ -7,10 +7,14 @@ import "@/models/UserSchema";
 import { connectDB } from "@/lib/mongodb";
 
 export async function GET() {
-  // returns a list of all products in the database
   try {
     await connectDB();
-    const products = await mongoose.model("Product").find({});
+    const products = await mongoose
+      .model("Product")
+      .find({})
+      .populate("supplierId", "name email")
+      .populate("createdBy", "name email")
+      .lean();
     return NextResponse.json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
@@ -43,6 +47,8 @@ export async function POST(req: Request) {
       price: z.number().positive(),
       costPrice: z.number().positive(),
       quantity: z.number().nonnegative(),
+      supplierId: z.string().length(24, "Invalid supplier ID"),
+      createdBy: z.string().length(24, "Invalid user ID"),
     }).parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -63,6 +69,8 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const newProduct = await mongoose.model("Product").create(body);
+    await newProduct.populate("supplierId", "name email");
+    await newProduct.populate("createdBy", "name email");
     return NextResponse.json(newProduct, { status: 201 });
   } catch (error) {
     console.error("Error creating product:", error);

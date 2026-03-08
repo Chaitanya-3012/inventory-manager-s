@@ -11,10 +11,13 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params;
-  // TODO: Replace with MongoDB query
   try {
     await connectDB();
-    const productData = await mongoose.model("Product").findById(id);
+    const productData = await mongoose
+      .model("Product")
+      .findById(id)
+      .populate("supplierId", "name email")
+      .populate("createdBy", "name email");
     if (!productData) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
@@ -41,15 +44,16 @@ export async function PUT(
       { status: 400 },
     );
   }
-  // TODO: Validate with Zod and update in MongoDB
   try {
     z.object({
-      name: z.string().min(2).max(100),
+      name: z.string().min(2).max(100).optional(),
       description: z.string().optional(),
-      category: z.string().min(5).max(100),
-      costPrice: z.number().positive(),
-      price: z.number().positive(),
-      quantity: z.number().nonnegative(),
+      category: z.string().min(5).max(100).optional(),
+      costPrice: z.number().positive().optional(),
+      price: z.number().positive().optional(),
+      quantity: z.number().nonnegative().optional(),
+      supplierId: z.string().length(24, "Invalid supplier ID").optional(),
+      createdBy: z.string().length(24, "Invalid user ID").optional(),
     }).parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -67,7 +71,9 @@ export async function PUT(
     await connectDB();
     const updatedProduct = await mongoose
       .model("Product")
-      .findByIdAndUpdate(id, body, { new: true });
+      .findByIdAndUpdate(id, body, { new: true })
+      .populate("supplierId", "name email")
+      .populate("createdBy", "name email");
     if (!updatedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }

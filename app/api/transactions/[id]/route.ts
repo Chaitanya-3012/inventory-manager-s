@@ -69,11 +69,66 @@ export async function PUT(
 
   try {
     await connectDB();
-    const updatedTransaction = await mongoose
-      .model("Transaction")
-      .findByIdAndUpdate(id, body, { new: true })
+    const Transaction = mongoose.model("Transaction");
+    const Product = mongoose.model("Product");
+
+    const oldTransaction = await Transaction.findById(id);
+    if (!oldTransaction) {
+      return NextResponse.json(
+        { error: "Transaction not found" },
+        { status: 404 },
+      );
+    }
+
+    const updatePayload = { ...body, updatedAt: new Date() };
+    const hasQtyOrTypeChange =
+      body.quantity !== undefined ||
+      body.transactionType !== undefined;
+
+    if (hasQtyOrTypeChange) {
+      const productId = oldTransaction.productId;
+      const product = await Product.findById(productId);
+      if (!product) {
+        return NextResponse.json(
+          { error: "Product not found" },
+          { status: 404 },
+        );
+      }
+
+      const oldQty = oldTransaction.quantity;
+      const oldType = oldTransaction.transactionType;
+      const newQty = body.quantity ?? oldQty;
+      const newType = body.transactionType ?? oldType;
+
+      const reverseOld =
+        oldType === "IN" ? -oldQty : oldQty;
+      const applyNew = newType === "IN" ? newQty : -newQty;
+      const delta = reverseOld + applyNew;
+      const newProductQty = (product.quantity ?? 0) + delta;
+
+      if (newProductQty < 0) {
+        return NextResponse.json(
+          {
+            error: "Insufficient stock",
+            details: `Cannot update: resulting quantity would be ${newProductQty}`,
+          },
+          { status: 400 },
+        );
+      }
+
+      await Product.findByIdAndUpdate(productId, {
+        quantity: newProductQty,
+        updatedAt: new Date(),
+      });
+    }
+
+    const updatedTransaction = await Transaction.findByIdAndUpdate(
+      id,
+      updatePayload,
+      { new: true },
+    )
       .populate("productId")
-      .populate("performedBy");
+      .populate("performedBy", "name email");
     if (!updatedTransaction) {
       return NextResponse.json(
         { error: "Transaction not found" },
@@ -114,15 +169,26 @@ export async function DELETE(
 
   try {
     await connectDB();
-    const deletedTransaction = await mongoose
-      .model("Transaction")
-      .findByIdAndDelete(id);
+    const Transaction = mongoose.model("Transaction");
+    const Product = mongoose.model("Product");
+
+    const deletedTransaction = await Transaction.findByIdAndDelete(id);
     if (!deletedTransaction) {
       return NextResponse.json(
         { error: "Transaction not found" },
         { status: 404 },
       );
     }
+
+    const reverseDelta =
+      deletedTransaction.transactionType === "IN"
+        ? -deletedTransaction.quantity
+        : deletedTransaction.quantity;
+    await Product.findByIdAndUpdate(deletedTransaction.productId, {
+      $inc: { quantity: reverseDelta },
+      updatedAt: new Date(),
+    });
+
     return NextResponse.json({ message: "Transaction deleted successfully" });
   } catch (error) {
     return NextResponse.json(

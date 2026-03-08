@@ -65,7 +65,38 @@ export async function POST(req: Request) {
 
   try {
     await connectDB();
-    const newTransaction = await mongoose.model("Transaction").create(body);
+    const Product = mongoose.model("Product");
+    const product = await Product.findById(body.productId);
+    if (!product) {
+      return NextResponse.json(
+        { error: "Product not found" },
+        { status: 404 },
+      );
+    }
+    const currentQty = product.quantity ?? 0;
+    const delta =
+      body.transactionType === "IN"
+        ? body.quantity
+        : -body.quantity;
+    const newQty = currentQty + delta;
+    if (newQty < 0) {
+      return NextResponse.json(
+        {
+          error: "Insufficient stock",
+          details: `Product has ${currentQty} units; cannot perform OUT of ${body.quantity}`,
+        },
+        { status: 400 },
+      );
+    }
+    const newTransaction = await mongoose
+      .model("Transaction")
+      .create(body);
+    await Product.findByIdAndUpdate(body.productId, {
+      quantity: newQty,
+      updatedAt: new Date(),
+    });
+    await newTransaction.populate("productId");
+    await newTransaction.populate("performedBy", "name email");
     return NextResponse.json(newTransaction, { status: 201 });
   } catch (error) {
     console.error("Error creating transaction:", error);

@@ -140,11 +140,11 @@ Note: Categories are represented as free-text on products (no dedicated collecti
 
 ### Frontend
 
-- **Framework**: Next.js 14+ with TypeScript
+- **Framework**: Next.js 15 with TypeScript
 - **UI Library**: React with shadcn/ui components
 - **Styling**: Tailwind CSS with dark/light mode support
 - **State Management**: React Hooks
-- **HTTP Client**: Fetch API
+- **HTTP Client**: Axios (lib/api-client.ts)
 
 ### Backend
 
@@ -170,36 +170,35 @@ Note: Categories are represented as free-text on products (no dedicated collecti
 
 ### Backend Tasks (10)
 
-- [ ] Setup MongoDB connection and validate models
-- [ ] Create User API endpoints (CRUD)
-
-- [ ] Create Supplier API endpoints (CRUD)
-- [ ] Create Product API endpoints (CRUD + filters)
-- [ ] Create Transaction API endpoints (CRUD)
+- [x] Setup MongoDB connection and validate models
+- [x] Create User API endpoints (CRUD)
+- [x] Create Supplier API endpoints (CRUD)
+- [x] Create Product API endpoints (CRUD + Zod validation)
+- [x] Create Transaction API endpoints (CRUD)
 - [ ] Implement quantity update logic on transactions
-- [ ] Add error handling and validation
-- [ ] Create API response standardization
-- [ ] Setup environment variables (.env.local)
+- [x] Add error handling and validation
+- [x] Create API response standardization
+- [x] Setup environment variables (.env.local)
 
 ### Frontend Tasks (10)
 
-- [ ] Build Entry Form component with all fields
-- [ ] Implement Data Table with sorting/filtering
-- [ ] Build Dashboard layout
-- [ ] Add form submission handlers
-- [ ] Implement data fetching hooks
-- [ ] Add loading and error states UI
-- [ ] Build Supplier dropdown component
-- [ ] Build Supplier dropdown component
-- [ ] Implement real-time quantity updates
-- [ ] Add edit/delete action buttons
+- [x] Build Entry Form component with all fields (AddProductDialog)
+- [x] Implement Data Table with pagination
+- [x] Build Dashboard layout
+- [x] Add form submission handlers
+- [x] Implement data fetching hooks (useProducts, useSuppliers, useUsers, useTransactions)
+- [x] Add loading and error states UI
+- [x] Build Supplier dropdown component
+- [x] Build User dropdown (createdBy) component
+- [x] Implement real-time table refresh on add product
+- [ ] Add edit/delete action buttons to Data Table
 
 ### Authentication & Security (5)
 
 - [ ] Implement user authentication system
 - [ ] Add role-based access control (RBAC)
 - [ ] Secure API endpoints with auth middleware
-- [ ] Implement password hashing with bcrypt
+- [x] Implement password hashing with bcrypt
 - [ ] Add JWT token management
 
 ### Testing & Deployment (2)
@@ -230,43 +229,40 @@ Note: Categories are represented as free-text on products (no dedicated collecti
 
 ```
 inventory-manager-s/
-├── api/                    # API routes and endpoints
-│   ├── users/
-│   ├── categories/
-│   ├── suppliers/
-│   ├── products/
-│   └── transactions/
 ├── app/
+│   ├── api/                   # Next.js API routes
+│   │   ├── users/             # GET, POST; [id]: GET, PUT, DELETE
+│   │   ├── suppliers/         # GET, POST; [id]: GET, PUT, DELETE
+│   │   ├── products/          # GET, POST; [id]: GET, PUT, DELETE
+│   │   └── transactions/      # GET, POST; [id]: GET, PUT, DELETE
 │   ├── dashboard/
 │   │   ├── layout.tsx
-│   │   ├── page.tsx
-│   │   └── parts/
-│   │       ├── addMenu.tsx
-│   │       ├── columns.tsx
-│   │       ├── data-page.tsx
-│   │       ├── data-table.tsx
-│   │       ├── entryForm.tsx
-│   │       └── toolbar.tsx
+│   │   ├── page.tsx           # Products page
+│   │   ├── add-product-dialog.tsx
+│   │   ├── columns.tsx
+│   │   ├── data-table.tsx
+│   │   └── ...
 │   ├── globals.css
 │   ├── layout.tsx
 │   └── page.tsx
-├── components/             # Reusable UI components
-│   ├── ui/
+├── components/                # Reusable UI components
+│   ├── ui/                    # shadcn/ui components
 │   ├── app-sidebar.tsx
 │   ├── nav-*.tsx
 │   └── theme-provider.tsx
-├── models/                # Mongoose schemas
+├── models/                    # Mongoose schemas
 │   ├── UserSchema.ts
 │   ├── SupplierSchema.ts
 │   ├── ProductSchema.ts
 │   └── TransactionSchema.ts
 ├── lib/
-│   ├── db.js             # MongoDB connection
-│   ├── Theme-Switch.ts
+│   ├── mongodb.ts             # MongoDB connection (connectDB)
+│   ├── api-client.ts          # Axios API client
 │   └── utils.ts
-├── hooks/                # Custom React hooks
+├── hooks/
+│   ├── use-api.ts             # useProducts, useSuppliers, useUsers, useTransactions
 │   └── use-mobile.ts
-├── public/               # Static assets
+├── public/
 ├── package.json
 ├── tsconfig.json
 ├── next.config.ts
@@ -279,36 +275,55 @@ inventory-manager-s/
 
 ### Completed
 
-✅ Database schemas created (users, suppliers, products, transactions)
-✅ Entity relationships defined
-✅ API endpoint specifications documented
-✅ Project structure initialized
-✅ UI component library setup (shadcn/ui)
-✅ Database connection configured (db.js)
-✅ Theme switching implemented
+**Backend**
+- ✅ MongoDB connection (lib/mongodb.ts)
+- ✅ All 4 Mongoose models (User, Supplier, Product, Transaction)
+- ✅ User API – full CRUD (GET, POST, PUT, DELETE)
+- ✅ Supplier API – full CRUD (GET, POST, PUT, DELETE)
+- ✅ Product API – full CRUD with Zod validation
+- ✅ Transaction API – full CRUD with Zod validation
+- ✅ Password hashing with bcrypt (user create/update)
+- ✅ Error handling and JSON validation in API routes
+- ✅ Environment variables (.env.local)
+
+**Frontend**
+- ✅ App sidebar and dashboard layout
+- ✅ Products page with Data Table (TanStack Table, pagination)
+- ✅ AddProductDialog – product form with all fields
+- ✅ Supplier and User dropdowns in AddProduct form
+- ✅ Form validation (Zod + React Hook Form + zodResolver)
+- ✅ Data fetching hooks (useProducts, useSuppliers, useUsers, useTransactions)
+- ✅ API client (lib/api-client.ts)
+- ✅ Loading overlay and error states
+- ✅ shadcn/ui component library
+- ✅ Theme switching (next-themes, dark/light)
 
 ### In Progress
 
-⏳ API endpoint implementation
-⏳ Frontend component development
+- ⏳ Quantity update logic when recording transactions
+- ⏳ Edit/delete action buttons on Data Table rows
 
 ### Pending
 
-❌ User authentication system
-❌ Form validation
-❌ Data table features (sorting, filtering)
-❌ Transaction logic implementation
-❌ Testing and deployment
+- ❌ User authentication system (login, sessions)
+- ❌ Role-based access control (RBAC)
+- ❌ API auth middleware
+- ❌ JWT token management
+- ❌ Data table sorting and filtering
+- ❌ Products by supplier / transactions by product endpoints
+- ❌ Unit and integration tests
+- ❌ Deployment setup
 
 ---
 
 ## 🎯 Next Steps Priority
 
-1. **High Priority** - Implement all API endpoints (foundation for backend)
-2. **High Priority** - Build Entry Form component (critical UI)
-3. **Medium Priority** - Implement Data Table with features
-4. **Medium Priority** - Add user authentication system
-5. **Low Priority** - Performance optimization and testing
+1. **High Priority** - Implement quantity update logic on transaction create/update
+2. **High Priority** - Add edit/delete action buttons to Data Table
+3. **Medium Priority** - Add user authentication system
+4. **Medium Priority** - Data table sorting and filtering
+5. **Low Priority** - Products by supplier / transactions by product endpoints
+6. **Low Priority** - Performance optimization and testing
 
 ---
 

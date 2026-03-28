@@ -24,12 +24,11 @@ const navItems = [
   { title: "Transactions", url: "/dashboard/transactions", icon: ArrowLeftRight },
 ];
 
-const data = {
-  user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+// Mock user data - in a real app, this would come from the session
+const userData = {
+  name: "John Doe",
+  email: "john@example.com",
+  avatar: "/avatars/john.jpg",
 };
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
@@ -71,7 +70,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   );

@@ -7,12 +7,28 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { Separator } from "@radix-ui/react-separator";
+import { cookies } from "next/headers";
+import { validateSessionToken } from "@/lib/auth-utils";
+import { redirect } from "next/navigation";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Check authentication on server side
+  const cookieStore = await cookies();
+  const token = cookieStore.get("auth_token")?.value;
+
+  if (!token) {
+    redirect("/login");
+  }
+
+  const session = await validateSessionToken(token);
+  if (!session) {
+    redirect("/login");
+  }
+
   return (
     <ThemeProvider
       attribute="class"

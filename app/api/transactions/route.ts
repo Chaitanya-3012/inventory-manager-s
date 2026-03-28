@@ -38,6 +38,10 @@ export async function POST(req: Request) {
     );
   }
 
+  // Check if this is an automated transaction (to prevent circular updates)
+  const isAutomated = body.isAutomated === true;
+  delete body.isAutomated; // Remove the flag from the actual transaction data
+
   try {
     z.object({
       productId: z.string().length(24, "Invalid product ID"),
@@ -45,6 +49,7 @@ export async function POST(req: Request) {
       transactionType: z.enum(["IN", "OUT"]),
       performedBy: z.string().length(24, "Invalid user ID"),
       notes: z.string().optional(),
+      isAutomated: z.boolean().optional(),
     }).parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -91,10 +96,16 @@ export async function POST(req: Request) {
     const newTransaction = await mongoose
       .model("Transaction")
       .create(body);
-    await Product.findByIdAndUpdate(body.productId, {
-      quantity: newQty,
-      updatedAt: new Date(),
-    });
+
+    // Only update product quantity if this is not an automated transaction
+    // Automated transactions are created from product updates, so we don't want to update the product again
+    if (!isAutomated) {
+      await Product.findByIdAndUpdate(body.productId, {
+        quantity: newQty,
+        updatedAt: new Date(),
+      });
+    }
+
     await newTransaction.populate("productId");
     await newTransaction.populate("performedBy", "name email");
     return NextResponse.json(newTransaction, { status: 201 });

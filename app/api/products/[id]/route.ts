@@ -5,6 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 import "@/models/ProductSchema";
 import "@/models/SupplierSchema";
 import "@/models/UserSchema";
+import "@/models/TransactionSchema";
 
 export async function GET(
   _req: Request,
@@ -69,14 +70,46 @@ export async function PUT(
   }
   try {
     await connectDB();
+
+    // Get the current product to compare quantities
+    const currentProduct = await mongoose.model("Product").findById(id);
+    if (!currentProduct) {
+      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+    }
+
     const updatedProduct = await mongoose
       .model("Product")
       .findByIdAndUpdate(id, body, { new: true })
       .populate("supplierId", "name email")
       .populate("createdBy", "name email");
+
     if (!updatedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+
+    // Automatically create a transaction if quantity changed
+    if (body.quantity !== undefined && body.quantity !== currentProduct.quantity) {
+      const Transaction = mongoose.model("Transaction");
+      const quantityDiff = body.quantity - currentProduct.quantity;
+
+      if (quantityDiff !== 0) {
+        const transactionType = quantityDiff > 0 ? "IN" : "OUT";
+        const absQuantity = Math.abs(quantityDiff);
+
+        // We need a performedBy user for the transaction, try to use the one from the update or fall back to the product creator
+        const performedBy = body.createdBy || currentProduct.createdBy;
+
+        await Transaction.create({
+          productId: updatedProduct._id,
+          quantity: absQuantity,
+          transactionType: transactionType,
+          performedBy: performedBy,
+          notes: `Quantity adjustment: ${currentProduct.quantity} → ${body.quantity}`,
+          isAutomated: true,
+        });
+      }
+    }
+
     return NextResponse.json(updatedProduct);
   } catch (error) {
     return NextResponse.json(

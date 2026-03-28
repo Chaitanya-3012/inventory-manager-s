@@ -17,6 +17,7 @@ const TransactionSchema = new mongoose.Schema({
   date: { type: Date, default: Date.now },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
+  isAutomated: { type: Boolean, default: false }, // Flag to prevent circular updates
 });
 
 export const Transaction =

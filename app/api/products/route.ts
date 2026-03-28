@@ -4,6 +4,7 @@ import { z } from "zod";
 import "@/models/ProductSchema";
 import "@/models/SupplierSchema";
 import "@/models/UserSchema";
+import "@/models/TransactionSchema";
 import { connectDB } from "@/lib/mongodb";
 
 export async function GET() {
@@ -69,6 +70,20 @@ export async function POST(req: Request) {
   try {
     await connectDB();
     const newProduct = await mongoose.model("Product").create(body);
+
+    // Automatically create an IN transaction for the initial quantity
+    if (body.quantity > 0) {
+      const Transaction = mongoose.model("Transaction");
+      await Transaction.create({
+        productId: newProduct._id,
+        quantity: body.quantity,
+        transactionType: "IN",
+        performedBy: body.createdBy,
+        notes: "Initial stock creation",
+        isAutomated: true,
+      });
+    }
+
     await newProduct.populate("supplierId", "name email");
     await newProduct.populate("createdBy", "name email");
     return NextResponse.json(newProduct, { status: 201 });

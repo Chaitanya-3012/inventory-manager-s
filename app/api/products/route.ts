@@ -1,100 +1,49 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { productSchema } from "@/lib/validation-schemas";
+import { withErrorHandling } from "@/lib/error-handler";
+import { sanitizeRequestBody } from "@/lib/sanitizer";
 import "@/models/ProductSchema";
 import "@/models/SupplierSchema";
 import "@/models/UserSchema";
 import "@/models/TransactionSchema";
 import { connectDB } from "@/lib/mongodb";
 
-export async function GET() {
-  try {
-    await connectDB();
-    const products = await mongoose
-      .model("Product")
-      .find({})
-      .populate("supplierId", "name email")
-      .populate("createdBy", "name email")
-      .lean();
-    return NextResponse.json(products);
-  } catch (error) {
-    console.error("Error fetching products:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to retrieve products",
-        details: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
-  }
-}
+export const GET = withErrorHandling(async () => {
+  await connectDB();
+  const products = await mongoose
+    .model("Product")
+    .find({})
+    .populate("supplierId", "name email")
+    .populate("createdBy", "name email")
+    .lean();
+  return NextResponse.json(products);
+});
 
-export async function POST(req: Request) {
-  let body;
-  try {
-    body = await req.json();
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Invalid JSON in request body" },
-      { status: 400 },
-    );
+export const POST = withErrorHandling(async (req: Request) => {
+  const body = await sanitizeRequestBody(req);
+
+  // Validate the request body
+  productSchema.parse(body);
+
+  await connectDB();
+  const newProduct = await mongoose.model("Product").create(body);
+
+  // Automatically create an IN transaction for the initial quantity
+  if (body.quantity > 0) {
+    const Transaction = mongoose.model("Transaction");
+    await Transaction.create({
+      productId: newProduct._id,
+      quantity: body.quantity,
+      transactionType: "IN",
+      performedBy: body.createdBy,
+      notes: "Initial stock creation",
+      isAutomated: true,
+    });
   }
 
-  try {
-    z.object({
-      name: z.string().min(2).max(100),
-      description: z.string().optional(),
-      category: z.string().min(5).max(100),
-      price: z.number().positive(),
-      costPrice: z.number().positive(),
-      quantity: z.number().nonnegative(),
-      supplierId: z.string().length(24, "Invalid supplier ID"),
-      createdBy: z.string().length(24, "Invalid user ID"),
-    }).parse(body);
-  } catch (error) {
-    if (error instanceof z.ZodError) {
-      return NextResponse.json(
-        { error: "Invalid product data", details: error.issues },
-        { status: 400 },
-      );
-    }
-    console.error("Validation error:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to validate product data",
-        details: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
-  }
-  try {
-    await connectDB();
-    const newProduct = await mongoose.model("Product").create(body);
-
-    // Automatically create an IN transaction for the initial quantity
-    if (body.quantity > 0) {
-      const Transaction = mongoose.model("Transaction");
-      await Transaction.create({
-        productId: newProduct._id,
-        quantity: body.quantity,
-        transactionType: "IN",
-        performedBy: body.createdBy,
-        notes: "Initial stock creation",
-        isAutomated: true,
-      });
-    }
-
-    await newProduct.populate("supplierId", "name email");
-    await newProduct.populate("createdBy", "name email");
-    return NextResponse.json(newProduct, { status: 201 });
-  } catch (error) {
-    console.error("Error creating product:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to create product",
-        details: error instanceof Error ? error.message : String(error),
-      },
-      { status: 500 },
-    );
-  }
-}
+  await newProduct.populate("supplierId", "name email");
+  await newProduct.populate("createdBy", "name email");
+  return NextResponse.json(newProduct, { status: 201 });
+});

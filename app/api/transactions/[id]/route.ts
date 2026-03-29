@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { z } from "zod";
+import { transactionSchema, transactionUpdateSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
 import "@/models/TransactionSchema";
 import "@/models/ProductSchema";
@@ -49,11 +50,7 @@ export async function PUT(
   }
 
   try {
-    z.object({
-      quantity: z.number().positive().optional(),
-      transactionType: z.enum(["IN", "OUT"]).optional(),
-      notes: z.string().optional(),
-    }).parse(body);
+    transactionUpdateSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -151,9 +148,7 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    z.object({
-      id: z.string().length(24, "Invalid transaction ID"),
-    }).parse({ id });
+    z.object({ id: z.string().length(24, "Invalid transaction ID") }).parse({ id });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

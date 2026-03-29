@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { transactionSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
 import "@/models/TransactionSchema";
 import "@/models/ProductSchema";
@@ -43,14 +44,7 @@ export async function POST(req: Request) {
   delete body.isAutomated; // Remove the flag from the actual transaction data
 
   try {
-    z.object({
-      productId: z.string().length(24, "Invalid product ID"),
-      quantity: z.number().positive(),
-      transactionType: z.enum(["IN", "OUT"]),
-      performedBy: z.string().length(24, "Invalid user ID"),
-      notes: z.string().optional(),
-      isAutomated: z.boolean().optional(),
-    }).parse(body);
+    transactionSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

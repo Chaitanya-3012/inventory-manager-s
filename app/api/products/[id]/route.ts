@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { z } from "zod";
+import { productSchema, productUpdateSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
 import "@/models/ProductSchema";
 import "@/models/SupplierSchema";
@@ -46,16 +47,7 @@ export async function PUT(
     );
   }
   try {
-    z.object({
-      name: z.string().min(2).max(100).optional(),
-      description: z.string().optional(),
-      category: z.string().min(5).max(100).optional(),
-      costPrice: z.number().positive().optional(),
-      price: z.number().positive().optional(),
-      quantity: z.number().nonnegative().optional(),
-      supplierId: z.string().length(24, "Invalid supplier ID").optional(),
-      createdBy: z.string().length(24, "Invalid user ID").optional(),
-    }).parse(body);
+    productUpdateSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { z } from "zod";
+import { userSchema, userUpdateSchema } from "@/lib/validation-schemas";
 import bcrypt from "bcrypt";
 import { connectDB } from "@/lib/mongodb";
 import "@/models/UserSchema";
@@ -41,13 +42,7 @@ export async function PUT(
   }
 
   try {
-    z.object({
-      name: z.string().min(2).max(100).optional(),
-      email: z.string().email().optional(),
-      role: z.enum(["admin", "manager", "staff"]).optional(),
-      department: z.string().min(2).max(100).optional(),
-      password: z.string().min(6).optional(),
-    }).parse(body);
+    userUpdateSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -93,9 +88,7 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    z.object({
-      id: z.string().length(24, "Invalid user ID"),
-    }).parse({ id });
+    z.object({ id: z.string().length(24, "Invalid user ID") }).parse({ id });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

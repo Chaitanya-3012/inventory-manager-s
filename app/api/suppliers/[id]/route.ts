@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 import { z } from "zod";
+import { supplierSchema, supplierUpdateSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
 import "@/models/SupplierSchema";
 
@@ -43,16 +44,7 @@ export async function PUT(
   }
 
   try {
-    z.object({
-      name: z.string().min(2).max(100).optional(),
-      email: z.string().email().optional(),
-      phone: z.string().min(10).optional(),
-      address: z.string().min(5).max(200).optional(),
-      city: z.string().min(2).max(100).optional(),
-      state: z.string().min(2).max(100).optional(),
-      country: z.string().min(2).max(100).optional(),
-      paymentTerms: z.string().optional(),
-    }).parse(body);
+    supplierUpdateSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
@@ -93,9 +85,7 @@ export async function DELETE(
   const { id } = await params;
 
   try {
-    z.object({
-      id: z.string().length(24, "Invalid supplier ID"),
-    }).parse({ id });
+    z.object({ id: z.string().length(24, "Invalid supplier ID") }).parse({ id });
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

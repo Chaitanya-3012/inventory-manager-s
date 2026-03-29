@@ -15,6 +15,9 @@
 
 # github co-pilot
 .github
+
+# Claude
+.claude
 # next.js
 /.next/
 /out/

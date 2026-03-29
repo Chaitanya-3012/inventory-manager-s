@@ -9,7 +9,8 @@
       "Bash(ls:*)",
       "Bash(npx tsx:*)",
       "Bash(npx dotenv:*)",
-      "Bash(npx dotenv-cli:*)"
+      "Bash(npx dotenv-cli:*)",
+      "Bash(git add:*)"
     ]
   }
 }

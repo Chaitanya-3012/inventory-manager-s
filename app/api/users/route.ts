@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
+import { userSchema } from "@/lib/validation-schemas";
 import bcrypt from "bcrypt";
 import { connectDB } from "@/lib/mongodb";
 import "@/models/UserSchema";
@@ -34,13 +35,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    z.object({
-      name: z.string().min(2).max(100),
-      email: z.string().email(),
-      role: z.enum(["admin", "manager", "staff"]),
-      department: z.string().min(2).max(100),
-      password: z.string().min(6),
-    }).parse(body);
+    userSchema.parse(body);
   } catch (error) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(

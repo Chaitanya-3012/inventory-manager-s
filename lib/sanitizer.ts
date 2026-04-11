@@ -9,7 +9,7 @@ export function sanitizeInput(input: string): string {
 }
 
 // Sanitize object properties recursively
-export function sanitizeObject(obj: any): any {
+export function sanitizeObject(obj: unknown): unknown {
   if (typeof obj === "string") {
     return sanitizeInput(obj);
   }
@@ -19,10 +19,10 @@ export function sanitizeObject(obj: any): any {
   }
 
   if (obj && typeof obj === "object") {
-    const sanitized: any = {};
+    const sanitized: Record<string, unknown> = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        sanitized[key] = sanitizeObject(obj[key]);
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        sanitized[key] = sanitizeObject((obj as Record<string, unknown>)[key]);
       }
     }
     return sanitized;
@@ -32,11 +32,11 @@ export function sanitizeObject(obj: any): any {
 }
 
 // Sanitize request body
-export async function sanitizeRequestBody(req: Request): Promise<any> {
+export async function sanitizeRequestBody(req: Request): Promise<unknown> {
   try {
     const body = await req.json();
     return sanitizeObject(body);
-  } catch (error) {
+  } catch (error: unknown) {
     throw new Error("Invalid JSON in request body");
   }
 }

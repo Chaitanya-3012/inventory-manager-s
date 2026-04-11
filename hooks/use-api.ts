@@ -31,6 +31,33 @@ export function useProducts() {
     fetchProducts();
   }, [fetchProducts]);
 
+  const exportProducts = async () => {
+    try {
+      const response = await productsAPI.export();
+      if (!response.ok) {
+        throw new Error(`Export failed with status ${response.status}`);
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `products-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Error exporting products:", err);
+      throw err;
+    }
+  };
+
   return {
     products,
     loading,
@@ -39,6 +66,7 @@ export function useProducts() {
     createProduct: productsAPI.create,
     updateProduct: productsAPI.update,
     deleteProduct: productsAPI.delete,
+    exportProducts,
   };
 }
 
@@ -101,6 +129,33 @@ export function useSuppliers() {
     fetchSuppliers();
   }, [fetchSuppliers]);
 
+  const exportSuppliers = async () => {
+    try {
+      const response = await suppliersAPI.export();
+      if (!response.ok) {
+        throw new Error(`Export failed with status ${response.status}`);
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `suppliers-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Error exporting suppliers:", err);
+      throw err;
+    }
+  };
+
   return {
     suppliers,
     loading,
@@ -109,6 +164,7 @@ export function useSuppliers() {
     createSupplier: suppliersAPI.create,
     updateSupplier: suppliersAPI.update,
     deleteSupplier: suppliersAPI.delete,
+    exportSuppliers,
   };
 }
 
@@ -136,6 +192,33 @@ export function useTransactions() {
     fetchTransactions();
   }, [fetchTransactions]);
 
+  const exportTransactions = async () => {
+    try {
+      const response = await transactionsAPI.export();
+      if (!response.ok) {
+        throw new Error(`Export failed with status ${response.status}`);
+      }
+
+      // Create a blob from the response
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+
+      // Clean up
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+    } catch (err) {
+      console.error("Error exporting transactions:", err);
+      throw err;
+    }
+  };
+
   return {
     transactions,
     loading,
@@ -144,5 +227,6 @@ export function useTransactions() {
     createTransaction: transactionsAPI.create,
     updateTransaction: transactionsAPI.update,
     deleteTransaction: transactionsAPI.delete,
+    exportTransactions,
   };
 }

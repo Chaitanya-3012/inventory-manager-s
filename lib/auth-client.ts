@@ -47,10 +47,10 @@ export async function login(credentials: LoginCredentials): Promise<AuthResponse
       success: true,
       user: data.user,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message || "Network error",
+      error: (error as Error).message || "Network error",
     };
   }
 }
@@ -78,10 +78,10 @@ export async function register(credentials: RegisterCredentials): Promise<AuthRe
       success: true,
       user: data.user,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message || "Network error",
+      error: (error as Error).message || "Network error",
     };
   }
 }
@@ -103,10 +103,10 @@ export async function logout(): Promise<{ success: boolean; error?: string }> {
     return {
       success: true,
     };
-  } catch (error: any) {
+  } catch (error: unknown) {
     return {
       success: false,
-      error: error.message || "Network error",
+      error: (error as Error).message || "Network error",
     };
   }
 }

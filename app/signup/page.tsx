@@ -48,8 +48,8 @@ export default function SignupPage() {
       // Redirect to dashboard on successful registration
       router.push("/dashboard");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message || "An error occurred during registration");
+    } catch (err: unknown) {
+      setError((err as Error).message || "An error occurred during registration");
     } finally {
       setLoading(false);
     }

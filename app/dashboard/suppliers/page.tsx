@@ -2,9 +2,11 @@
 
 import { AddSupplierDialog } from "./add-supplier-dialog";
 import { supplierColumns, SupplierRow } from "./columns";
-import { DataTable } from "@/components/data-table";
+import { DataTableEnhanced } from "@/components/data-table/data-table-enhanced";
 import { useSuppliers } from "@/hooks/use-api";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
+import { Button } from "@/components/ui/button";
+import { DownloadIcon } from "lucide-react";
 
 export default function SuppliersPage() {
   const {
@@ -12,10 +14,20 @@ export default function SuppliersPage() {
     loading: suppliersLoading,
     error: suppliersError,
     refetch: refetchSuppliers,
+    exportSuppliers,
   } = useSuppliers();
 
   const handleSupplierAdded = () => {
     refetchSuppliers();
+  };
+
+  const handleExport = async () => {
+    try {
+      await exportSuppliers();
+    } catch (err) {
+      console.error("Export failed:", err);
+      alert("Export failed. Please try again.");
+    }
   };
 
   return (
@@ -24,7 +36,13 @@ export default function SuppliersPage() {
 
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Suppliers</h1>
-        <AddSupplierDialog onSupplierAdded={handleSupplierAdded} />
+        <div className="flex gap-2">
+          <Button onClick={handleExport} variant="outline" size="sm">
+            <DownloadIcon className="mr-2 h-4 w-4" />
+            Export CSV
+          </Button>
+          <AddSupplierDialog onSupplierAdded={handleSupplierAdded} />
+        </div>
       </div>
 
       {suppliersError && (
@@ -33,10 +51,15 @@ export default function SuppliersPage() {
         </div>
       )}
 
-      <DataTable
+      <DataTableEnhanced
         columns={supplierColumns}
         data={suppliers as SupplierRow[]}
-        isLoading={false}
+        isLoading={suppliersLoading}
+        filterableColumns={[
+          { id: "name", title: "Name" },
+          { id: "city", title: "City" },
+          { id: "country", title: "Country" },
+        ]}
       />
     </main>
   );

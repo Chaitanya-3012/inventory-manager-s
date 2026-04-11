@@ -67,6 +67,10 @@ export const productsAPI = {
   ) => request<unknown>(`/products/${id}`, { method: "PUT", body: data }),
   delete: (id: string) =>
     request<unknown>(`/products/${id}`, { method: "DELETE" }),
+  export: () => {
+    const url = `${API_BASE}/products/export`;
+    return fetch(url, { method: "GET" });
+  },
 };
 
 // ============= USERS API =============
@@ -123,6 +127,10 @@ export const suppliersAPI = {
   ) => request<unknown>(`/suppliers/${id}`, { method: "PUT", body: data }),
   delete: (id: string) =>
     request<unknown>(`/suppliers/${id}`, { method: "DELETE" }),
+  export: () => {
+    const url = `${API_BASE}/suppliers/export`;
+    return fetch(url, { method: "GET" });
+  },
 };
 
 // ============= TRANSACTIONS API =============
@@ -148,4 +156,8 @@ export const transactionsAPI = {
     request<unknown>(`/transactions/${id}`, { method: "PUT", body: data }),
   delete: (id: string) =>
     request<unknown>(`/transactions/${id}`, { method: "DELETE" }),
+  export: () => {
+    const url = `${API_BASE}/transactions/export`;
+    return fetch(url, { method: "GET" });
+  },
 };

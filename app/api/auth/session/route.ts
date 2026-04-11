@@ -36,7 +36,7 @@ export async function GET(request: Request) {
       },
       { status: 200 }
     );
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Session validation error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

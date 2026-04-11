@@ -3,7 +3,7 @@ import { ZodError } from "zod";
 
 // Custom error classes for different types of errors
 export class ValidationError extends Error {
-  constructor(message: string, public details?: any) {
+  constructor(message: string, public details?: unknown) {
     super(message);
     this.name = "ValidationError";
   }
@@ -31,14 +31,14 @@ export class ForbiddenError extends Error {
 }
 
 export class DatabaseError extends Error {
-  constructor(message: string, public originalError?: Error) {
+  constructor(message: string, public originalError?: Error | undefined) {
     super(message);
     this.name = "DatabaseError";
   }
 }
 
 export class InternalServerError extends Error {
-  constructor(message: string, public originalError?: Error) {
+  constructor(message: string, public originalError?: Error | undefined) {
     super(message);
     this.name = "InternalServerError";
   }
@@ -153,13 +153,13 @@ export function handleApiError(error: unknown): Response {
 }
 
 // Helper function to wrap API route handlers with error handling
-export function withErrorHandling<T extends (...args: any[]) => Promise<Response>>(
+export function withErrorHandling<T extends (...args: unknown[]) => Promise<Response>>(
   handler: T
 ): (...args: Parameters<T>) => Promise<Response> {
   return async (...args: Parameters<T>): Promise<Response> => {
     try {
       return await handler(...args);
-    } catch (error) {
+    } catch (error: unknown) {
       return handleApiError(error);
     }
   };

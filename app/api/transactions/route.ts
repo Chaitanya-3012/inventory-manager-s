@@ -21,11 +21,9 @@ export const GET = withErrorHandling(async () => {
 export const POST = withErrorHandling(async (req: Request) => {
   const body = await sanitizeRequestBody(req);
 
-  // Check if this is an automated transaction (to prevent circular updates)
   const isAutomated = body.isAutomated === true;
-  delete body.isAutomated; // Remove the flag from the actual transaction data
+  delete body.isAutomated;
 
-  // Validate the request body
   transactionSchema.parse(body);
 
   await connectDB();
@@ -47,8 +45,6 @@ export const POST = withErrorHandling(async (req: Request) => {
     .model("Transaction")
     .create(body);
 
-  // Only update product quantity if this is not an automated transaction
-  // Automated transactions are created from product updates, so we don't want to update the product again
   if (!isAutomated) {
     await Product.findByIdAndUpdate(body.productId, {
       quantity: newQty,

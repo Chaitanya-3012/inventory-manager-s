@@ -4,7 +4,6 @@ let isConnected = false;
 
 export async function connectDB() {
   if (isConnected) {
-    console.log("Using existing database connection");
     return;
   }
 
@@ -13,20 +12,17 @@ export async function connectDB() {
 
     if (!MONGODB_URI) {
       throw new Error(
-        "Please define the MONGODB_URI environment variable inside .env.local",
+        "Please define the MONGODB_URI environment variable",
       );
     }
 
-    console.log("Connecting to MongoDB...");
     await mongoose.connect(MONGODB_URI, {
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
     });
 
     isConnected = true;
-    console.log("✓ MongoDB connected successfully");
   } catch (error) {
-    console.error("✗ MongoDB connection error:", error);
     throw new Error(`Failed to connect to MongoDB: ${error}`);
   }
 }

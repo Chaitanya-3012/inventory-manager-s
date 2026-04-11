@@ -8,7 +8,6 @@ export async function POST(request: Request) {
   try {
     const { email, password } = await request.json();
 
-    // Validate input
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
@@ -16,10 +15,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Connect to database
     await connectDB();
 
-    // Find user by email
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json(
@@ -28,7 +25,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user is active
     if (!user.isActive) {
       return NextResponse.json(
         { error: "Account is deactivated" },
@@ -36,7 +32,6 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verify password
     const isValidPassword = await bcrypt.compare(password, user.password);
     if (!isValidPassword) {
       return NextResponse.json(
@@ -45,10 +40,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create session
     const sessionToken = await createSession(user._id.toString());
 
-    // Create response with cookie
     const response = NextResponse.json(
       {
         success: true,
@@ -63,13 +56,12 @@ export async function POST(request: Request) {
       { status: 200 }
     );
 
-    // Set cookie with session token
     response.cookies.set("auth_token", sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return response;

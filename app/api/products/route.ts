@@ -24,13 +24,11 @@ export const GET = withErrorHandling(async () => {
 export const POST = withErrorHandling(async (req: Request) => {
   const body = await sanitizeRequestBody(req);
 
-  // Validate the request body
   productSchema.parse(body);
 
   await connectDB();
   const newProduct = await mongoose.model("Product").create(body);
 
-  // Automatically create an IN transaction for the initial quantity
   if (body.quantity > 0) {
     const Transaction = mongoose.model("Transaction");
     await Transaction.create({

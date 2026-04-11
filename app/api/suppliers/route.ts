@@ -16,7 +16,6 @@ export const GET = withErrorHandling(async () => {
 export const POST = withErrorHandling(async (req: Request) => {
   const body = await sanitizeRequestBody(req);
 
-  // Validate the request body
   supplierSchema.parse(body);
 
   await connectDB();

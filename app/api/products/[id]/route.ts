@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import { z } from "zod";
 import { productSchema, productUpdateSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/ProductSchema";
-import "@/models/SupplierSchema";
-import "@/models/UserSchema";
-import "@/models/TransactionSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Product, Supplier, User, Transaction } from "@/models";
 
 export async function GET(
   _req: Request,
@@ -15,8 +14,7 @@ export async function GET(
   const { id } = await params;
   try {
     await connectDB();
-    const productData = await mongoose
-      .model("Product")
+    const productData = await Product
       .findById(id)
       .populate("supplierId", "name email")
       .populate("createdBy", "name email");
@@ -64,13 +62,12 @@ export async function PUT(
     await connectDB();
 
     // Get the current product to compare quantities
-    const currentProduct = await mongoose.model("Product").findById(id);
+    const currentProduct = await Product.findById(id);
     if (!currentProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
 
-    const updatedProduct = await mongoose
-      .model("Product")
+    const updatedProduct = await Product
       .findByIdAndUpdate(id, body, { new: true })
       .populate("supplierId", "name email")
       .populate("createdBy", "name email");
@@ -81,7 +78,6 @@ export async function PUT(
 
     // Automatically create a transaction if quantity changed
     if (body.quantity !== undefined && body.quantity !== currentProduct.quantity) {
-      const Transaction = mongoose.model("Transaction");
       const quantityDiff = body.quantity - currentProduct.quantity;
 
       if (quantityDiff !== 0) {
@@ -135,9 +131,7 @@ export async function DELETE(
   }
   try {
     await connectDB();
-    const deletedProduct = await mongoose
-      .model("Product")
-      .findByIdAndDelete(id);
+    const deletedProduct = await Product.findByIdAndDelete(id);
     if (!deletedProduct) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }

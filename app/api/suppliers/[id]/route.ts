@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import { z } from "zod";
 import { supplierSchema, supplierUpdateSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/SupplierSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Supplier } from "@/models";
 
 export async function GET(
   _req: Request,
@@ -12,7 +14,7 @@ export async function GET(
   const { id } = await params;
   try {
     await connectDB();
-    const supplierData = await mongoose.model("Supplier").findById(id);
+    const supplierData = await Supplier.findById(id);
     if (!supplierData) {
       return NextResponse.json(
         { error: "Supplier not found" },
@@ -60,9 +62,7 @@ export async function PUT(
 
   try {
     await connectDB();
-    const updatedSupplier = await mongoose
-      .model("Supplier")
-      .findByIdAndUpdate(id, body, { new: true });
+    const updatedSupplier = await Supplier.findByIdAndUpdate(id, body, { new: true });
     if (!updatedSupplier) {
       return NextResponse.json(
         { error: "Supplier not found" },
@@ -101,9 +101,7 @@ export async function DELETE(
 
   try {
     await connectDB();
-    const deletedSupplier = await mongoose
-      .model("Supplier")
-      .findByIdAndDelete(id);
+    const deletedSupplier = await Supplier.findByIdAndDelete(id);
     if (!deletedSupplier) {
       return NextResponse.json(
         { error: "Supplier not found" },

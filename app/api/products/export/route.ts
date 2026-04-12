@@ -1,19 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { Parser } from "json2csv";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/ProductSchema";
-import "@/models/SupplierSchema";
-import "@/models/UserSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Product, Supplier, User } from "@/models";
 
 export const GET = async (_request: Request) => {
   try {
     await connectDB();
 
     // Fetch all products with populated references
-    const products = await mongoose
-      .model("Product")
+    const products = await Product
       .find({})
       .populate("supplierId", "name email")
       .populate("createdBy", "name email")

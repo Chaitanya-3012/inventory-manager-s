@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
-import User from "@/models/UserSchema";
 import { connectDB } from "@/lib/mongodb";
 import { createSession } from "@/lib/auth-utils";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { User } from "@/models/UserSchema";
+import { Session } from "@/models/Session";
 
 export async function POST(request: Request) {
   try {

@@ -1,4 +1,4 @@
-# Inventory Management System
+# Inventory Management System (IMS)
 
 A comprehensive web-based inventory management application built with Next.js 15, MongoDB, and TypeScript. This system allows businesses to efficiently track products, manage stock levels, record transactions, and monitor inventory through an interactive dashboard.
 
@@ -11,6 +11,7 @@ A comprehensive web-based inventory management application built with Next.js 15
 - **Supplier Management** - Track and manage supplier information and contacts
 - **User Authentication** - Secure login with role-based access control
 - **Dashboard Analytics** - Interactive data visualization and reporting
+- **Documentation** - Comprehensive about page with system documentation
 - **Dark/Light Mode** - Responsive UI with theme switching support
 - **CSV Export** - Export products, suppliers, and transactions data
 
@@ -51,6 +52,10 @@ inventory-manager/
 ├── app/                     # Next.js app directory
 │   ├── api/                 # API routes
 │   ├── dashboard/           # Dashboard pages and components
+│   │   ├── about/           # About page with documentation
+│   │   ├── products/        # Product management
+│   │   ├── suppliers/       # Supplier management
+│   │   ├── transactions/    # Transaction tracking
 │   ├── login/               # Login page
 │   ├── signup/              # Signup page
 │   ├── layout.tsx           # Root layout

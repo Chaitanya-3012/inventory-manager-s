@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Command, Package, Truck, ArrowLeftRight } from "lucide-react";
+import { ShoppingCart, Package, Truck, ArrowLeftRight, Info } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -22,6 +22,7 @@ const navItems = [
   { title: "Products", url: "/dashboard/products", icon: Package },
   { title: "Suppliers", url: "/dashboard/suppliers", icon: Truck },
   { title: "Transactions", url: "/dashboard/transactions", icon: ArrowLeftRight },
+  { title: "About", url: "/dashboard/about", icon: Info },
 ];
 
 // In a real app, this would come from the session
@@ -46,10 +47,10 @@ export function AppSidebar({
             <SidebarMenuButton size="lg" asChild>
               <Link href="/dashboard/products">
                 <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                  <Command className="size-4" />
+                  <ShoppingCart className="size-4" />
                 </div>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">Atlas Inc</span>
+                  <span className="truncate font-medium">IMS</span>
                 </div>
               </Link>
             </SidebarMenuButton>

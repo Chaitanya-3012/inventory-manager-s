@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import { z } from "zod";
 import { transactionSchema, transactionUpdateSchema } from "@/lib/validation-schemas";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/TransactionSchema";
-import "@/models/ProductSchema";
-import "@/models/UserSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Transaction, Product, User } from "@/models";
 
 export async function GET(
   _req: Request,
@@ -14,8 +14,7 @@ export async function GET(
   const { id } = await params;
   try {
     await connectDB();
-    const transactionData = await mongoose
-      .model("Transaction")
+    const transactionData = await Transaction
       .findById(id)
       .populate("productId")
       .populate("performedBy");
@@ -66,8 +65,6 @@ export async function PUT(
 
   try {
     await connectDB();
-    const Transaction = mongoose.model("Transaction");
-    const Product = mongoose.model("Product");
 
     const oldTransaction = await Transaction.findById(id);
     if (!oldTransaction) {
@@ -164,8 +161,6 @@ export async function DELETE(
 
   try {
     await connectDB();
-    const Transaction = mongoose.model("Transaction");
-    const Product = mongoose.model("Product");
 
     const deletedTransaction = await Transaction.findByIdAndDelete(id);
     if (!deletedTransaction) {

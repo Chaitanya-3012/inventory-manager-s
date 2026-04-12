@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 import { z } from "zod";
 import { userSchema, userUpdateSchema } from "@/lib/validation-schemas";
 import bcrypt from "bcrypt";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/UserSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { User } from "@/models";
 
 export async function GET(
   _req: Request,
@@ -13,7 +15,7 @@ export async function GET(
   const { id } = await params;
   try {
     await connectDB();
-    const userData = await mongoose.model("User").findById(id);
+    const userData = await User.findById(id);
     if (!userData) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -66,9 +68,7 @@ export async function PUT(
         password: hashedPassword,
       };
     }
-    const updatedUser = await mongoose
-      .model("User")
-      .findByIdAndUpdate(id, updateData, { new: true });
+    const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
     if (!updatedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
@@ -104,7 +104,7 @@ export async function DELETE(
 
   try {
     await connectDB();
-    const deletedUser = await mongoose.model("User").findByIdAndDelete(id);
+    const deletedUser = await User.findByIdAndDelete(id);
     if (!deletedUser) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }

@@ -1,15 +1,17 @@
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { userSchema } from "@/lib/validation-schemas";
 import bcrypt from "bcrypt";
 import { withErrorHandling } from "@/lib/error-handler";
 import { sanitizeRequestBody } from "@/lib/sanitizer";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/UserSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { User } from "@/models";
 
 export const GET = withErrorHandling(async () => {
   await connectDB();
-  const users = await mongoose.model("User").find({});
+  const users = await User.find({});
   return NextResponse.json(users);
 });
 
@@ -24,8 +26,6 @@ export const POST = withErrorHandling(async (req: Request) => {
     password: hashedPassword,
   };
   await connectDB();
-  const newUser = await mongoose
-    .model("User")
-    .create(userDataWithHashedPassword);
+  const newUser = await User.create(userDataWithHashedPassword);
   return NextResponse.json(newUser, { status: 201 });
 });

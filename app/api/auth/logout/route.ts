@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { deleteSession } from "@/lib/auth-utils";
 
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+
 export async function POST(request: Request) {
   try {
     // Get the session token from cookies

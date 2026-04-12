@@ -1,19 +1,17 @@
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { productSchema } from "@/lib/validation-schemas";
 import { withErrorHandling } from "@/lib/error-handler";
 import { sanitizeRequestBody } from "@/lib/sanitizer";
-import "@/models/ProductSchema";
-import "@/models/SupplierSchema";
-import "@/models/UserSchema";
-import "@/models/TransactionSchema";
 import { connectDB } from "@/lib/mongodb";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Product, Supplier, User, Transaction } from "@/models";
 
 export const GET = withErrorHandling(async () => {
   await connectDB();
-  const products = await mongoose
-    .model("Product")
+  const products = await Product
     .find({})
     .populate("supplierId", "name email")
     .populate("createdBy", "name email")
@@ -27,10 +25,9 @@ export const POST = withErrorHandling(async (req: Request) => {
   productSchema.parse(body);
 
   await connectDB();
-  const newProduct = await mongoose.model("Product").create(body);
+  const newProduct = await Product.create(body);
 
   if (body.quantity > 0) {
-    const Transaction = mongoose.model("Transaction");
     await Transaction.create({
       productId: newProduct._id,
       quantity: body.quantity,

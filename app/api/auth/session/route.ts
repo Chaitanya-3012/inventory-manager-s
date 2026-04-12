@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import { validateSessionToken } from "@/lib/auth-utils";
 
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Session } from "@/models/Session";
+
 export async function GET(request: Request) {
   try {
     // Get the session token from cookies

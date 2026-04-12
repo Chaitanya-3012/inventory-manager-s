@@ -1,17 +1,16 @@
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { transactionSchema } from "@/lib/validation-schemas";
 import { withErrorHandling } from "@/lib/error-handler";
 import { sanitizeRequestBody } from "@/lib/sanitizer";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/TransactionSchema";
-import "@/models/ProductSchema";
-import "@/models/UserSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Transaction, Product, User } from "@/models";
 
 export const GET = withErrorHandling(async () => {
   await connectDB();
-  const transactions = await mongoose
-    .model("Transaction")
+  const transactions = await Transaction
     .find({})
     .populate("productId")
     .populate("performedBy");
@@ -27,7 +26,6 @@ export const POST = withErrorHandling(async (req: Request) => {
   transactionSchema.parse(body);
 
   await connectDB();
-  const Product = mongoose.model("Product");
   const product = await Product.findById(body.productId);
   if (!product) {
     throw new Error("Product not found");
@@ -41,9 +39,7 @@ export const POST = withErrorHandling(async (req: Request) => {
   if (newQty < 0) {
     throw new Error(`Insufficient stock: Product has ${currentQty} units; cannot perform OUT of ${body.quantity}`);
   }
-  const newTransaction = await mongoose
-    .model("Transaction")
-    .create(body);
+  const newTransaction = await Transaction.create(body);
 
   if (!isAutomated) {
     await Product.findByIdAndUpdate(body.productId, {

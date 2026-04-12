@@ -1,8 +1,10 @@
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { Parser } from "json2csv";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/SupplierSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Supplier } from "@/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const GET = async (_request: Request) => {
@@ -10,7 +12,7 @@ export const GET = async (_request: Request) => {
     await connectDB();
 
     // Fetch all suppliers
-    const suppliers = await mongoose.model("Supplier").find({});
+    const suppliers = await Supplier.find({});
 
     // Transform data for CSV export
     const csvData = suppliers.map(supplier => ({

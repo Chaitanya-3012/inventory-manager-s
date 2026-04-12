@@ -24,4 +24,6 @@ const SessionSchema = new mongoose.Schema({
 // Index for automatic cleanup of expired sessions
 SessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-export default mongoose.models.Session || mongoose.model("Session", SessionSchema);
+const Session = mongoose.models.Session || mongoose.model("Session", SessionSchema);
+export default Session;
+export { Session };

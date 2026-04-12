@@ -11,6 +11,9 @@ import { cookies } from "next/headers";
 import { validateSessionToken } from "@/lib/auth-utils";
 import { redirect } from "next/navigation";
 
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+
 export default async function RootLayout({
   children,
 }: Readonly<{

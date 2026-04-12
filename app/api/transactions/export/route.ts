@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { Parser } from "json2csv";
 import { connectDB } from "@/lib/mongodb";
-import "@/models/TransactionSchema";
-import "@/models/ProductSchema";
-import "@/models/UserSchema";
+
+// Import models to ensure they're registered with Mongoose
+import "@/models";
+import { Transaction, Product, User } from "@/models";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const GET = async (_request: Request) => {
@@ -12,8 +12,7 @@ export const GET = async (_request: Request) => {
     await connectDB();
 
     // Fetch all transactions with populated references
-    const transactions = await mongoose
-      .model("Transaction")
+    const transactions = await Transaction
       .find({})
       .populate("productId", "name")
       .populate("performedBy", "name email")

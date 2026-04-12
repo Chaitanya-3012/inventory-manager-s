@@ -1,9 +1,10 @@
 import { cookies } from "next/headers";
 import { jwtVerify, SignJWT } from "jose";
 import { nanoid } from "nanoid";
-import User from "@/models/UserSchema";
-import Session from "@/models/Session";
 import { connectDB } from "@/lib/mongodb";
+
+// Import Session model directly
+import { Session } from "@/models/Session";
 
 // JWT secret - in production, use a strong secret from environment variables
 const JWT_SECRET = new TextEncoder().encode(

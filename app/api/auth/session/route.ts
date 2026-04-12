@@ -30,6 +30,7 @@ export async function GET(request: Request) {
         authenticated: true,
         user: {
           id: session.userId,
+          name: session.userName,
           email: session.userEmail,
           role: session.userRole,
         },

@@ -24,14 +24,18 @@ const navItems = [
   { title: "Transactions", url: "/dashboard/transactions", icon: ArrowLeftRight },
 ];
 
-// Mock user data - in a real app, this would come from the session
+// In a real app, this would come from the session
+// For now, we'll use placeholder data since we don't have access to session context here
 const userData = {
-  name: "John Doe",
-  email: "john@example.com",
-  avatar: "/avatars/john.jpg",
+  name: "User Name", // This will be replaced with actual user data
+  email: "user@example.com",
+  avatar: "/avatars/user.jpg",
 };
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({
+  user,
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: { name: string; email: string; avatar: string } }) {
   const pathname = usePathname();
 
   return (
@@ -70,7 +74,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={userData} />
+        <NavUser user={user} />
       </SidebarFooter>
     </Sidebar>
   );

@@ -67,7 +67,7 @@ export default function ProductsPage() {
         filterableColumns={[
           { id: "name", title: "Name" },
           { id: "category", title: "Category" },
-          { id: "supplierId.name", title: "Supplier" },
+          { id: "supplierId", title: "Supplier" },
         ]}
       />
     </main>

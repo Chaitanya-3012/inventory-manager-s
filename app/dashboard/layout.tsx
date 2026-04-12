@@ -29,6 +29,13 @@ export default async function RootLayout({
     redirect("/login");
   }
 
+  // Prepare user data for the sidebar
+  const userData = {
+    name: session.userName || "User",
+    email: session.userEmail || "user@example.com",
+    avatar: "/avatars/user.jpg", // You might want to implement proper avatar handling
+  };
+
   return (
     <ThemeProvider
       attribute="class"
@@ -37,7 +44,7 @@ export default async function RootLayout({
       disableTransitionOnChange
     >
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar user={userData} />
         <SidebarInset>
           <header className="flex h-16 shrink-0 items-center justify-between gap-2">
             <div className="flex items-center gap-2 px-4">

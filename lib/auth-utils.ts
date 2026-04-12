@@ -68,6 +68,7 @@ export async function validateSessionToken(token: string) {
 
   return {
     userId: session.userId._id.toString(),
+    userName: session.userId.name,
     userEmail: session.userId.email,
     userRole: session.userId.role,
   };

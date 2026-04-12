@@ -60,7 +60,7 @@ export const columns: ColumnDef<ProductRow>[] = [
     },
   },
   {
-    accessorKey: "supplierId.name",
+    accessorKey: "supplierId",
     header: "Supplier",
     cell: ({ row }) => {
       const supplier = row.original.supplierId;

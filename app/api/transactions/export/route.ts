@@ -6,7 +6,6 @@ import { connectDB } from "@/lib/mongodb";
 import "@/models";
 import { Transaction, Product, User } from "@/models";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const GET = async (_request: Request) => {
   try {
     await connectDB();
@@ -19,19 +18,24 @@ export const GET = async (_request: Request) => {
       .lean();
 
     // Transform data for CSV export
-    const csvData = transactions.map(transaction => ({
-      id: (transaction as any)._id.toString(),
-      product: (transaction as any).productId?.name || "",
-      productId: (transaction as any).productId?._id.toString() || "",
-      quantity: (transaction as any).quantity,
-      transactionType: (transaction as any).transactionType,
-      performedBy: (transaction as any).performedBy?.name || "",
-      performedByEmail: (transaction as any).performedBy?.email || "",
-      notes: (transaction as any).notes || "",
-      date: (transaction as any).date ? new Date((transaction as any).date).toISOString() : "",
-      createdAt: (transaction as any).createdAt ? new Date((transaction as any).createdAt).toISOString() : "",
-      updatedAt: (transaction as any).updatedAt ? new Date((transaction as any).updatedAt).toISOString() : ""
-    }));
+    const csvData = transactions.map(transaction => {
+      // Type assertions for lean document properties
+      const leanTransaction = transaction as any;
+
+      return {
+        id: leanTransaction._id.toString(),
+        product: leanTransaction.productId?.name || "",
+        productId: leanTransaction.productId?._id.toString() || "",
+        quantity: leanTransaction.quantity,
+        transactionType: leanTransaction.transactionType,
+        performedBy: leanTransaction.performedBy?.name || "",
+        performedByEmail: leanTransaction.performedBy?.email || "",
+        notes: leanTransaction.notes || "",
+        date: leanTransaction.date ? new Date(leanTransaction.date).toISOString() : "",
+        createdAt: leanTransaction.createdAt ? new Date(leanTransaction.createdAt).toISOString() : "",
+        updatedAt: leanTransaction.updatedAt ? new Date(leanTransaction.updatedAt).toISOString() : ""
+      };
+    });
 
     // Generate CSV
     const json2csvParser = new Parser();

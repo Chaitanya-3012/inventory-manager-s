@@ -1,6 +1,10 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
+import { Button } from "@/components/ui/button";
+import { UndoIcon } from "lucide-react";
+import { transactionsAPI } from "@/lib/api-client";
+import { toast } from "sonner";
 
 export type TransactionRow = {
   _id: string;
@@ -11,6 +15,8 @@ export type TransactionRow = {
   notes?: string;
   date?: string;
   createdAt?: string;
+  isReversal?: boolean;
+  reversedBy?: string | null;
 };
 
 export const transactionColumns: ColumnDef<TransactionRow>[] = [
@@ -78,6 +84,48 @@ export const transactionColumns: ColumnDef<TransactionRow>[] = [
       const date = row.getValue("date") as string | undefined;
       if (!date) return "-";
       return new Date(date).toLocaleDateString();
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const transaction = row.original;
+
+      // Don't show undo button for reversal transactions or already undone transactions
+      if (transaction.isReversal || transaction.reversedBy) {
+        return <span className="text-gray-400">-</span>;
+      }
+
+      const handleUndo = async () => {
+        if (!confirm(`Are you sure you want to undo this ${transaction.transactionType} transaction of ${transaction.quantity} units? This will create a reverse transaction.`)) {
+          return;
+        }
+
+        try {
+          await transactionsAPI.undo(transaction._id);
+          toast.success("Transaction undone successfully");
+          // Refresh the page to show updated data
+          window.location.reload();
+        } catch (error) {
+          const err = error as { response?: { data?: { error?: string } } };
+          const errorMessage =
+            err?.response?.data?.error || "Failed to undo transaction";
+          toast.error(errorMessage);
+        }
+      };
+
+      return (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleUndo}
+          className="flex items-center gap-1"
+        >
+          <UndoIcon className="h-4 w-4" />
+          Undo
+        </Button>
+      );
     },
   },
 ];

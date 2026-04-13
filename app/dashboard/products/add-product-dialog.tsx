@@ -36,7 +36,7 @@ import { useAuth } from "@/contexts/auth-context";
 
 const productSchema = z.object({
   name: z.string().min(1, "Product name is required").max(100, "Product name is too long"),
-  description: z.string().optional().max(500, "Description is too long"),
+  description: z.string().max(500, "Description is too long").optional(),
   price: z.coerce.number()
     .min(0, "Price must be non-negative")
     .max(1000000, "Price seems too high, please verify"),

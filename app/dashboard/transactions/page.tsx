@@ -1,13 +1,27 @@
 "use client";
 
 import * as React from "react";
-import { transactionColumns, TransactionRow } from "./columns";
+import { transactionColumns } from "./columns";
 import { AddTransactionDialog } from "./add-transaction-dialog";
 import { DataTableEnhanced } from "@/components/data-table/data-table-enhanced";
 import { useProducts, useTransactions, useUsers } from "@/hooks/use-api";
 import { LoadingOverlay } from "@/components/ui/loading-overlay";
 import { Button } from "@/components/ui/button";
 import { DownloadIcon } from "lucide-react";
+
+// Define the TransactionRow type here to avoid import issues
+type TransactionRow = {
+  _id: string;
+  productId: { _id: string; name: string } | string;
+  quantity: number;
+  transactionType: "IN" | "OUT";
+  performedBy: { _id: string; name: string } | string;
+  notes?: string;
+  date?: string;
+  createdAt?: string;
+  isReversal?: boolean;
+  reversedBy?: string | null;
+};
 
 export default function TransactionsPage() {
   const {

@@ -156,6 +156,8 @@ export const transactionsAPI = {
     request<unknown>(`/transactions/${id}`, { method: "PUT", body: data }),
   delete: (id: string) =>
     request<unknown>(`/transactions/${id}`, { method: "DELETE" }),
+  undo: (id: string) =>
+    request<unknown>(`/transactions/${id}/undo`, { method: "POST" }),
   export: () => {
     const url = `${API_BASE}/transactions/export`;
     return fetch(url, { method: "GET" });

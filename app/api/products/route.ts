@@ -20,9 +20,8 @@ export const GET = withErrorHandling(async () => {
 });
 
 export const POST = withErrorHandling(async (req: Request) => {
-  const body = await sanitizeRequestBody(req);
-
-  productSchema.parse(body);
+  const rawData = await sanitizeRequestBody(req);
+  const body = productSchema.parse(rawData);
 
   await connectDB();
   const newProduct = await Product.create(body);

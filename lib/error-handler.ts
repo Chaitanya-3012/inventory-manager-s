@@ -153,12 +153,12 @@ export function handleApiError(error: unknown): Response {
 }
 
 // Helper function to wrap API route handlers with error handling
-export function withErrorHandling<T extends (...args: unknown[]) => Promise<Response>>(
+export function withErrorHandling<T extends (req: Request, ...args: unknown[]) => Promise<Response>>(
   handler: T
-): (...args: Parameters<T>) => Promise<Response> {
-  return async (...args: Parameters<T>): Promise<Response> => {
+): (req: Request, ...args: unknown[]) => Promise<Response> {
+  return async (req: Request, ...args: unknown[]): Promise<Response> => {
     try {
-      return await handler(...args);
+      return await handler(req, ...args);
     } catch (error: unknown) {
       return handleApiError(error);
     }

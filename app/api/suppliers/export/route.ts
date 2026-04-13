@@ -6,7 +6,6 @@ import { connectDB } from "@/lib/mongodb";
 import "@/models";
 import { Supplier } from "@/models";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const GET = async (_request: Request) => {
   try {
     await connectDB();
@@ -15,20 +14,25 @@ export const GET = async (_request: Request) => {
     const suppliers = await Supplier.find({});
 
     // Transform data for CSV export
-    const csvData = suppliers.map(supplier => ({
-      id: (supplier as any)._id.toString(),
-      name: (supplier as any).name,
-      email: (supplier as any).email,
-      phone: (supplier as any).phone,
-      address: (supplier as any).address,
-      city: (supplier as any).city,
-      state: (supplier as any).state,
-      country: (supplier as any).country,
-      paymentTerms: (supplier as any).paymentTerms || "",
-      isActive: (supplier as any).isActive ? "Yes" : "No",
-      createdAt: (supplier as any).createdAt ? new Date((supplier as any).createdAt).toISOString() : "",
-      updatedAt: (supplier as any).updatedAt ? new Date((supplier as any).updatedAt).toISOString() : ""
-    }));
+    const csvData = suppliers.map(supplier => {
+      // Type assertions for lean document properties
+      const leanSupplier = supplier as any;
+
+      return {
+        id: leanSupplier._id.toString(),
+        name: leanSupplier.name,
+        email: leanSupplier.email,
+        phone: leanSupplier.phone,
+        address: leanSupplier.address,
+        city: leanSupplier.city,
+        state: leanSupplier.state,
+        country: leanSupplier.country,
+        paymentTerms: leanSupplier.paymentTerms || "",
+        isActive: leanSupplier.isActive ? "Yes" : "No",
+        createdAt: leanSupplier.createdAt ? new Date(leanSupplier.createdAt).toISOString() : "",
+        updatedAt: leanSupplier.updatedAt ? new Date(leanSupplier.updatedAt).toISOString() : ""
+      };
+    });
 
     // Generate CSV
     const json2csvParser = new Parser();

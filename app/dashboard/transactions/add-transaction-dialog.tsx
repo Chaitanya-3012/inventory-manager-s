@@ -32,18 +32,23 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { transactionsAPI } from "@/lib/api-client";
 import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/contexts/auth-context";
 
 const transactionSchema = z.object({
   productId: z.string().min(1, "Product is required"),
-  quantity: z.coerce.number().positive("Quantity must be positive"),
+  quantity: z.coerce.number()
+    .positive("Quantity must be positive")
+    .lte(10000, "Quantity seems too large, please verify"),
   transactionType: z.enum(["IN", "OUT"], {
     required_error: "Type is required",
   }),
-  performedBy: z.string().min(1, "Performed by is required"),
   notes: z.string().optional(),
 });
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
+
+// Extend the type to include performedBy for the API call
+type TransactionAPIData = TransactionFormValues & { performedBy: string };
 
 interface AddTransactionDialogProps {
   onTransactionAdded: () => void;
@@ -58,6 +63,7 @@ export function AddTransactionDialog({
 }: AddTransactionDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const { user } = useAuth();
 
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema) as Resolver<TransactionFormValues>,
@@ -65,15 +71,40 @@ export function AddTransactionDialog({
       productId: "",
       quantity: 1,
       transactionType: "IN",
-      performedBy: "",
       notes: "",
     },
   });
 
   async function onSubmit(data: TransactionFormValues) {
+    if (!user) {
+      toast.error("You must be logged in to create a transaction");
+      return;
+    }
+
+    // Show confirmation for large quantities or OUT transactions
+    if (data.quantity > 1000) {
+      const confirmed = window.confirm(
+        `Are you sure you want to record a transaction for ${data.quantity} units? This seems like a large quantity.`
+      );
+      if (!confirmed) return;
+    }
+
+    if (data.transactionType === "OUT" && data.quantity > 100) {
+      const confirmed = window.confirm(
+        `Are you sure you want to remove ${data.quantity} units from inventory? This seems like a large OUT transaction.`
+      );
+      if (!confirmed) return;
+    }
+
     setIsLoading(true);
     try {
-      await transactionsAPI.create(data);
+      // Automatically set performedBy to the current user
+      const transactionData: TransactionAPIData = {
+        ...data,
+        performedBy: user.id,
+      };
+
+      await transactionsAPI.create(transactionData);
 
       toast.success("Transaction recorded successfully");
 
@@ -81,7 +112,6 @@ export function AddTransactionDialog({
         productId: "",
         quantity: 1,
         transactionType: "IN",
-        performedBy: "",
         notes: "",
       });
       setOpen(false);
@@ -176,34 +206,6 @@ export function AddTransactionDialog({
                   <FormControl>
                     <Input type="number" min={1} placeholder="1" {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField<TransactionFormValues>
-              control={form.control}
-              name="performedBy"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Performed By</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value as string}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a user" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user._id} value={user._id}>
-                          {user.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

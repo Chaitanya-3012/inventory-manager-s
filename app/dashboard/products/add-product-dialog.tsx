@@ -32,19 +32,28 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { productsAPI } from "@/lib/api-client";
 import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/contexts/auth-context";
 
 const productSchema = z.object({
-  name: z.string().min(1, "Product name is required"),
-  description: z.string().optional(),
-  price: z.coerce.number().min(0, "Price must be positive"),
-  costPrice: z.coerce.number().min(0, "Cost price must be positive"),
-  quantity: z.coerce.number().min(0, "Quantity must be non-negative"),
-  category: z.string().min(1, "Category is required"),
+  name: z.string().min(1, "Product name is required").max(100, "Product name is too long"),
+  description: z.string().optional().max(500, "Description is too long"),
+  price: z.coerce.number()
+    .min(0, "Price must be non-negative")
+    .max(1000000, "Price seems too high, please verify"),
+  costPrice: z.coerce.number()
+    .min(0, "Cost price must be non-negative")
+    .max(1000000, "Cost price seems too high, please verify"),
+  quantity: z.coerce.number()
+    .min(0, "Quantity must be non-negative")
+    .max(1000000, "Quantity seems too large, please verify"),
+  category: z.string().min(1, "Category is required").max(50, "Category name is too long"),
   supplierId: z.string().min(1, "Supplier is required"),
-  createdBy: z.string().min(1, "Created by is required"),
 });
 
 type ProductFormValues = z.infer<typeof productSchema>;
+
+// Extend the type to include createdBy for the API call
+type ProductAPIData = ProductFormValues & { createdBy: string };
 
 interface AddProductDialogProps {
   onProductAdded: () => void;
@@ -59,6 +68,7 @@ export function AddProductDialog({
 }: AddProductDialogProps) {
   const [open, setOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const { user } = useAuth();
 
   const form = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema) as Resolver<ProductFormValues>,
@@ -70,14 +80,39 @@ export function AddProductDialog({
       quantity: 0,
       category: "",
       supplierId: "",
-      createdBy: "",
     },
   });
 
   async function onSubmit(data: ProductFormValues) {
+    if (!user) {
+      toast.error("You must be logged in to create a product");
+      return;
+    }
+
+    // Show confirmation for potentially incorrect data
+    if (data.price > 0 && data.costPrice > 0 && data.price < data.costPrice) {
+      const confirmed = window.confirm(
+        `The selling price ($${data.price}) is less than the cost price ($${data.costPrice}). This will result in a loss on each sale. Are you sure you want to continue?`
+      );
+      if (!confirmed) return;
+    }
+
+    if (data.price > 10000) {
+      const confirmed = window.confirm(
+        `The selling price ($${data.price}) seems very high. Are you sure this is correct?`
+      );
+      if (!confirmed) return;
+    }
+
     setIsLoading(true);
     try {
-      await productsAPI.create(data);
+      // Automatically set createdBy to the current user
+      const productData: ProductAPIData = {
+        ...data,
+        createdBy: user.id,
+      };
+
+      await productsAPI.create(productData);
 
       toast.success("Product created successfully");
 
@@ -228,34 +263,6 @@ export function AddProductDialog({
                       {suppliers.map((sup) => (
                         <SelectItem key={sup._id} value={sup._id}>
                           {sup.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField<ProductFormValues>
-              control={form.control}
-              name="createdBy"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Created By</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value as string | undefined}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a user" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user._id} value={user._id}>
-                          {user.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

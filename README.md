@@ -2,6 +2,8 @@
 
 A comprehensive web-based inventory management application built with Next.js 15, MongoDB, and TypeScript. This system allows businesses to efficiently track products, manage stock levels, record transactions, and monitor inventory through an interactive dashboard.
 
+**Live Demo**: [https://inventory-manager-s.vercel.app](https://inventory-manager-s.vercel.app)
+
 ## 🚀 Features
 
 ### Core Functionality
@@ -14,12 +16,23 @@ A comprehensive web-based inventory management application built with Next.js 15
 - **Documentation** - Comprehensive about page with system documentation
 - **Dark/Light Mode** - Responsive UI with theme switching support
 - **CSV Export** - Export products, suppliers, and transactions data
+- **Transaction Undo** - Ability to undo accidental transactions with automatic inventory adjustment
+
+### Advanced Features
+- **Error Handling** - Comprehensive error handling with user-friendly messages
+- **Data Validation** - End-to-end input validation and sanitization
+- **Responsive Design** - Fully responsive UI that works on all device sizes
+- **Role-Based Access Control** - Different permission levels for admin, manager, and staff users
+- **Audit Trail** - Track all user activities and changes
+- **Confirmation Prompts** - Safety checks for destructive operations
 
 ### Security & Access Control
 - **User Authentication** - Secure login with JWT-based session management
 - **Role-Based Access** - Admin, manager, and staff roles with appropriate permissions
 - **Data Validation** - Comprehensive input validation and sanitization
 - **Protected Routes** - Middleware protection for authenticated areas
+- **Secure Password Storage** - Password hashing with bcrypt
+- **Session Management** - Secure session handling with expiration
 
 ## 🏗️ Technology Stack
 
@@ -31,6 +44,8 @@ A comprehensive web-based inventory management application built with Next.js 15
 - **State Management**: React Hooks
 - **Data Tables**: TanStack Table for efficient data rendering
 - **Forms**: React Hook Form with Zod validation
+- **Icons**: Lucide React icons
+- **Notifications**: Sonner toast notifications
 
 ### Backend
 - **Runtime**: Node.js
@@ -39,11 +54,15 @@ A comprehensive web-based inventory management application built with Next.js 15
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT-based session management
 - **Validation**: Zod schema validation
+- **Security**: Input sanitization with sanitize-html
+- **Utilities**: nanoid for unique ID generation
 
 ### Development Tools
 - **Package Manager**: npm
 - **Version Control**: Git
 - **Build Tool**: Turbopack
+- **Linting**: ESLint with TypeScript support
+- **Code Formatting**: Prettier
 
 ## 📁 Project Structure
 
@@ -115,6 +134,14 @@ inventory-manager/
 - `notes` (String) - Transaction notes
 - `date` (DateTime) - Transaction date
 - `createdAt`, `updatedAt` (DateTime)
+- `isAutomated` (Boolean) - Flag for automated transactions
+
+### Session Collection
+- `_id` (ObjectId) - Primary Key
+- `userId` (ObjectId) - User reference
+- `token` (String) - Session token
+- `expiresAt` (DateTime) - Session expiration
+- `createdAt`, `updatedAt` (DateTime)
 
 ## 🔧 Installation
 
@@ -134,7 +161,6 @@ inventory-manager/
    ```env
    MONGODB_URI=your_mongodb_connection_string
    AUTH_SECRET=your_jwt_secret_key
-   NEXT_PUBLIC_API_URL=http://localhost:3000
    ```
 
 4. **Run the development server**
@@ -154,11 +180,15 @@ inventory-manager/
 
 ## 🚀 Deployment
 
-### Vercel (Recommended)
+### Vercel Deployment (Recommended)
+The application is currently deployed at: [https://inventory-manager-s.vercel.app](https://inventory-manager-s.vercel.app)
+
+To deploy your own instance:
+
 1. Connect your GitHub repository to Vercel
 2. Set environment variables in Vercel dashboard:
-   - `MONGODB_URI`
-   - `AUTH_SECRET`
+   - `MONGODB_URI` - Your MongoDB connection string
+   - `AUTH_SECRET` - A secret key for JWT token signing
 3. Deploy!
 
 ### Other Platforms
@@ -170,7 +200,6 @@ The application can be deployed to any Node.js hosting platform that supports Ne
 |----------|-------------|----------|
 | `MONGODB_URI` | MongoDB connection string | Yes |
 | `AUTH_SECRET` | Secret key for JWT token signing | Yes |
-| `NEXT_PUBLIC_API_URL` | API base URL | Optional |
 
 ## 👥 User Roles
 
@@ -193,6 +222,7 @@ The application uses shadcn/ui components for a consistent and modern user inter
 - Navigation sidebar
 - Dark/light theme toggle
 - Responsive layout
+- Confirmation dialogs for critical actions
 
 ## 🔐 Security Features
 
@@ -201,6 +231,8 @@ The application uses shadcn/ui components for a consistent and modern user inter
 - Input validation and sanitization
 - Protected API routes
 - Role-based access control
+- Session timeout and cleanup
+- XSS prevention through input sanitization
 
 ## 📈 Performance Optimizations
 
@@ -209,6 +241,14 @@ The application uses shadcn/ui components for a consistent and modern user inter
 - Efficient database queries with Mongoose
 - Optimized data fetching with React hooks
 - Turbopack for fast development builds
+- Client-side caching for improved UX
+
+## 🔄 Recent Enhancements
+
+- **Undo Functionality** - Added ability to undo transactions with automatic inventory adjustment
+- **Improved Error Handling** - Enhanced error handling with better user feedback
+- **Enhanced Forms** - Added validation and user context to forms
+- **About Page Updates** - Updated documentation to reflect new features
 
 ## 🤝 Contributing
 

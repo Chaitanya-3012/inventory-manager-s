@@ -106,6 +106,7 @@ export default function AboutPage() {
               <li><strong>Type Classification:</strong> Categorize transactions as purchases, sales, or adjustments</li>
               <li><strong>Quantity Tracking:</strong> Monitor inventory levels in real-time</li>
               <li><strong>User Accountability:</strong> Track which user performed each transaction</li>
+              <li><strong>Error Correction:</strong> Undo accidental transactions with automatic inventory adjustment</li>
               <li><strong>Reporting:</strong> Generate reports on transaction history and trends</li>
             </ul>
           </CardContent>

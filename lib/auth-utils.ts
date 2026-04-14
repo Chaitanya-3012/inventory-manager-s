@@ -80,14 +80,14 @@ export async function deleteSession(token: string) {
   await Session.deleteOne({ token });
 }
 
-export async function getCurrentUser() {
-  const cookieStore = cookies();
-  const token = cookieStore.get("auth_token")?.value;
+// export async function getCurrentUser() {
+//   const cookieStore = cookies();
+//   const token = cookieStore.get("auth_token")?.value;
 
-  if (!token) {
-    return null;
-  }
+//   if (!token) {
+//     return null;
+//   }
 
-  const session = await validateSessionToken(token);
-  return session;
-}
+//   const session = await validateSessionToken(token);
+//   return session;
+// }

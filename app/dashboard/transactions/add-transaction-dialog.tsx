@@ -40,7 +40,7 @@ const transactionSchema = z.object({
     .positive("Quantity must be positive")
     .lte(10000, "Quantity seems too large, please verify"),
   transactionType: z.enum(["IN", "OUT"], {
-    required_error: "Type is required",
+    message: "Type is required",
   }),
   notes: z.string().optional(),
 });

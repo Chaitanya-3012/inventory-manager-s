@@ -34,8 +34,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDownIcon, SearchIcon } from "lucide-react";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+interface DataTableProps<TData> {
+  columns: ColumnDef<TData>[];
   data: TData[];
   isLoading?: boolean;
   filterableColumns?: {
@@ -67,12 +67,12 @@ const globalFuzzyFilter: FilterFn<unknown> = (row, columnId, filterValue) => {
   return cellValue.includes(searchTerm.toLowerCase());
 };
 
-export function DataTableEnhanced<TData, TValue>({
+export function DataTableEnhanced<TData>({
   columns,
   data,
   isLoading = false,
   filterableColumns = [],
-}: DataTableProps<TData, TValue>) {
+}: DataTableProps<TData>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -82,7 +82,7 @@ export function DataTableEnhanced<TData, TValue>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: columns as ColumnDef<unknown, unknown>[],
     state: {
       sorting,
       columnFilters,

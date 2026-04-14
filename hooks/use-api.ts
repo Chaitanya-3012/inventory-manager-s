@@ -18,7 +18,7 @@ export function useProducts() {
     setError(null);
     try {
       const data = await productsAPI.getAll();
-      setProducts(Array.isArray(data) ? data : []);
+      setProducts(Array.isArray(data) ? data as ProductRow[] : []);
     } catch (err: any) {
       setError(err.message || "Failed to fetch products");
       console.error("Error fetching products:", err);

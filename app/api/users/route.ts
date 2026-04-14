@@ -16,11 +16,13 @@ export const GET = withErrorHandling(async () => {
 });
 
 export const POST = withErrorHandling(async (req: Request) => {
-  const body = await sanitizeRequestBody(req);
+  const sanitizedBody = await sanitizeRequestBody(req);
+  const body = sanitizedBody as Record<string, unknown>;
 
   userSchema.parse(body);
 
-  const hashedPassword = await bcrypt.hash(body.password, 10);
+  const password = body.password as string;
+  const hashedPassword = await bcrypt.hash(password, 10);
   const userDataWithHashedPassword = {
     ...body,
     password: hashedPassword,

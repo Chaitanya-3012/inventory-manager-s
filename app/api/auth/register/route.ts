@@ -6,7 +6,6 @@ import { createSession } from "@/lib/auth-utils";
 // Import models to ensure they're registered with Mongoose
 import "@/models";
 import { User } from "@/models/UserSchema";
-import { Session } from "@/models/Session";
 
 export async function POST(request: Request) {
   try {

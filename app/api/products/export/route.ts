@@ -5,7 +5,7 @@ import { connectDB } from "@/lib/mongodb";
 
 // Import models to ensure they're registered with Mongoose
 import "@/models";
-import { Product, Supplier, User } from "@/models";
+import { Product } from "@/models";
 
 export const GET = async (_request: Request) => {
   try {

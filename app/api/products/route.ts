@@ -7,7 +7,7 @@ import { connectDB } from "@/lib/mongodb";
 
 // Import models to ensure they're registered with Mongoose
 import "@/models";
-import { Product, Supplier, User, Transaction } from "@/models";
+import { Product, Transaction } from "@/models";
 
 export const GET = withErrorHandling(async () => {
   await connectDB();
